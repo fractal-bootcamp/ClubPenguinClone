@@ -3,56 +3,55 @@
 // it actually checks if what was sent was a 
 // and returns 
 
+import { Penguin } from "../lib/penguin/types";
 import redis from "./redisClient";
+import { setPenguinData } from "./redisOps";
 
-type Penguin = {
-    id: string,
-    email: string,
-    name: string,
-    color: string,
-    currentPos: [number, number],
+
+type MovementHandlerProps = {
+    penguin: Penguin;
     clickDestPos: [number, number] | null,
     clickOriginPos: [number, number] | null
     arrowKeyPressed: string | null
 }
 
-type MovementHandlerProps = {
-    penguin: Penguin;
-
-}
-
 // if the penguin movement is passed as a click
 // then process it as a clik
 
-export const movementHandler = ({ penguin }: MovementHandlerProps) => {
+export const movementHandler = (props: MovementHandlerProps) => {
 
-    if (penguin.clickDestPos) {
-        handleClickMovement({ penguin })
+    if (props.clickDestPos) {
+        const response = handleClickMovement(props)
+        if (response) return response
+        return null
     }
-    else if (penguin.arrowKeyPressed) {
-        handleArrowKeyMovement()
+    else if (props.arrowKeyPressed) {
+        const response = handleArrowKeyMovement()
+        // if (response) return response
+        // return null
 
     }
 }
 
-const handleClickMovement = ({ penguin }: MovementHandlerProps) => {
-    const { currentPos, clickDestPos, clickOriginPos, arrowKeyPressed } = penguin
+const handleClickMovement = async (props: MovementHandlerProps) => {
+    const { penguin, clickDestPos } = props
+    const { id, currentPos } = penguin
 
     if (clickDestPos) {
         const [currX, currY] = currentPos;
         const [destX, destY] = clickDestPos;
-        const newX = calculateNewDim(currX, destX)
-        const newY = calculateNewDim(currY, destY)
+        const newX = await calculateNewDim(currX, destX)
+        const newY = await calculateNewDim(currY, destY)
+        const newPenguin: Penguin = { ...penguin, currentPos: [newX, newY] }
+        const response = await setPenguinData(id, newPenguin)
+        console.log(response)
+        return response
+    }
+    else {
+        return null
     }
 
 }
-
-// const testRedisConnection = async () => {
-//     console.log('running')
-//     await redis.set('test2', 'testerer')
-//     const response = await redis.get('test2')
-//     console.log(response)
-// }
 
 const calculateNewDim = (currD, destD) => {
     if (destD > currD) {
@@ -70,4 +69,14 @@ const handleArrowKeyMovement = () => {
 
 }
 
-testRedisConnection();
+const testPenguin: Penguin = {
+    id: 'test',
+    email: 'test@test.com',
+    name: 'test',
+    color: 'red',
+    currentPos: [0, 0],
+}
+
+console.log('initial penguin:', testPenguin)
+
+console.log(await movementHandler({ penguin: testPenguin, clickDestPos: [1, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
