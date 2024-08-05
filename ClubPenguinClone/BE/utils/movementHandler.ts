@@ -5,11 +5,11 @@
 
 import { Penguin } from "../lib/penguin/types";
 import redis from "./redisClient";
-import { setPenguinData } from "./redisOps";
+import { getPenguinData, setPenguinData } from "./redisOps";
 
 
 type MovementHandlerProps = {
-    penguin: Penguin;
+    penguinId: string;
     clickDestPos: [number, number] | null,
     clickOriginPos: [number, number] | null
     arrowKeyPressed: string | null
@@ -34,8 +34,10 @@ export const movementHandler = (props: MovementHandlerProps) => {
 }
 
 const handleClickMovement = async (props: MovementHandlerProps) => {
-    const { penguin, clickDestPos } = props
-    const { id, currentPos } = penguin
+    const { penguinId, clickDestPos } = props
+    const targetPenguin = await getPenguinData(penguinId)
+    if (!targetPenguin) return null
+    const { currentPos } = targetPenguin
 
     if (clickDestPos) {
         const [currX, currY] = currentPos;
@@ -79,4 +81,11 @@ const testPenguin: Penguin = {
 
 console.log('initial penguin:', testPenguin)
 
-console.log(await movementHandler({ penguin: testPenguin, clickDestPos: [1, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
+debugger;
+console.log(await movementHandler({ penguin: testPenguin, clickDestPos: [3, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
+console.log('new penguin after click:', await getPenguinData('test'))
+debugger;
+console.log(await movementHandler({ penguin: testPenguin, clickDestPos: [3, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
+console.log('new penguin after click:', await getPenguinData('test'))
+console.log(await movementHandler({ penguin: testPenguin, clickDestPos: [3, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
+console.log('new penguin after click:', await getPenguinData('test'))   
