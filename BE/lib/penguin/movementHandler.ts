@@ -4,8 +4,8 @@
 // and returns 
 
 import { Penguin } from "./types";
-import redis from "../../utils/redisClient";
-import { getPenguinData, setPenguinData } from "../../utils/redisOps";
+import redis from "../utils/redisClient";
+import { getPenguinData, setPenguinData } from "../utils/redisOps";
 
 
 type MovementHandlerProps = {

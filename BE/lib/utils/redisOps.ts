@@ -1,4 +1,4 @@
-import { Penguin } from "../lib/penguin/types"
+import { Penguin } from "../penguin/types"
 import redis from "./redisClient"
 
 export const setPenguinData = async (penguinId: string, newPenguin: Penguin) => {
