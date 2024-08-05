@@ -3,6 +3,8 @@
 // it actually checks if what was sent was a 
 // and returns 
 
+import redis from "./redisClient";
+
 type Penguin = {
     id: string,
     email: string,
@@ -43,11 +45,14 @@ const handleClickMovement = ({ penguin }: MovementHandlerProps) => {
         const newY = calculateNewDim(currY, destY)
     }
 
-
-    if (clickDestPos)
-
-
 }
+
+// const testRedisConnection = async () => {
+//     console.log('running')
+//     await redis.set('test2', 'testerer')
+//     const response = await redis.get('test2')
+//     console.log(response)
+// }
 
 const calculateNewDim = (currD, destD) => {
     if (destD > currD) {
@@ -64,3 +69,5 @@ const calculateNewDim = (currD, destD) => {
 const handleArrowKeyMovement = () => {
 
 }
+
+testRedisConnection();
