@@ -3,13 +3,13 @@
 // it actually checks if what was sent was a 
 // and returns 
 
-import { Penguin } from "../lib/penguin/types";
-import redis from "./redisClient";
-import { setPenguinData } from "./redisOps";
+import { Penguin } from "./types";
+import redis from "../../utils/redisClient";
+import { getPenguinData, setPenguinData } from "../../utils/redisOps";
 
 
 type MovementHandlerProps = {
-    penguin: Penguin;
+    penguinId: string;
     clickDestPos: [number, number] | null,
     clickOriginPos: [number, number] | null
     arrowKeyPressed: string | null
@@ -34,17 +34,24 @@ export const movementHandler = (props: MovementHandlerProps) => {
 }
 
 const handleClickMovement = async (props: MovementHandlerProps) => {
-    const { penguin, clickDestPos } = props
-    const { id, currentPos } = penguin
+    const { penguinId, clickDestPos } = props
+    const penguin = await getPenguinData(penguinId)
+    if (!penguin) return null
+    const { currentPos } = penguin
 
     if (clickDestPos) {
         const [currX, currY] = currentPos;
         const [destX, destY] = clickDestPos;
         const newX = await calculateNewDim(currX, destX)
         const newY = await calculateNewDim(currY, destY)
+
+        // TODO: set the orientation of the penguin through the comparison of 
+        // current and destination positions
+
         const newPenguin: Penguin = { ...penguin, currentPos: [newX, newY] }
-        const response = await setPenguinData(id, newPenguin)
+        const response = await setPenguinData(penguinId, newPenguin)
         console.log(response)
+
         return response
     }
     else {
@@ -53,15 +60,18 @@ const handleClickMovement = async (props: MovementHandlerProps) => {
 
 }
 
-const calculateNewDim = (currD, destD) => {
-    if (destD > currD) {
-        return currD + 1
+// 0,0 -> 3, 1
+// 1,0
+
+const calculateNewDim = (currDim, destDim) => {
+    if (destDim > currDim) {
+        return currDim + 1
     }
-    else if (destD < currD) {
-        return currD - 1
+    else if (destDim < currDim) {
+        return currDim - 1
     }
     else {
-        return currD
+        return currDim
     }
 }
 
@@ -70,7 +80,7 @@ const handleArrowKeyMovement = () => {
 }
 
 const testPenguin: Penguin = {
-    id: 'test',
+    id: 'bruno',
     email: 'test@test.com',
     name: 'test',
     color: 'red',
@@ -78,5 +88,13 @@ const testPenguin: Penguin = {
 }
 
 console.log('initial penguin:', testPenguin)
+await setPenguinData('bruno', testPenguin)
+debugger;
 
-console.log(await movementHandler({ penguin: testPenguin, clickDestPos: [1, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
+console.log(await movementHandler({ penguinId: "bruno", clickDestPos: [3, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
+console.log('new penguin after click:', await getPenguinData('bruno'))
+debugger;
+console.log(await movementHandler({ penguinId: "bruno", clickDestPos: [3, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
+console.log('new penguin after click:', await getPenguinData('bruno'))
+console.log(await movementHandler({ penguinId: "bruno", clickDestPos: [3, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
+console.log('new penguin after click:', await getPenguinData('bruno'))   
