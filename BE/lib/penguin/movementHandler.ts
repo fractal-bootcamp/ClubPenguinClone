@@ -18,7 +18,28 @@ type MovementHandlerProps = {
 // if the penguin movement is passed as a click
 // then process it as a clik
 
+
 export const movementHandler = (props: MovementHandlerProps) => {
+
+
+
+    // movement handler 
+    // give me all the penguins that have a difference between their current position 
+    // checkPenguinDiff(allPenguins)
+    // if a penguin has a difference, move them once towards it. movementHandler() is one handler and one step
+
+    // refactor Penguin so that it also holds the destination and origin
+    // clickHandler sets the destination of the penguin.
+    // the game loop runs checkPenguinDiff() which does a filter on array of all penguins
+    // (create a redisOp to retrieve list of all penguins)
+    // map over diffedPenguins and run movementHandler() so that all penguins are moved one step 
+    // closer to their destination (we can use movementHandler off the shelf here)
+    // 
+    // at this point we might not even need to publish the changes? it's possible
+    // because the frontend can just pull the list 
+    // once the destination has been reached, set the destination to null again
+    // 
+
 
     if (props.clickDestPos) {
         const response = handleClickMovement(props)
@@ -51,6 +72,8 @@ const handleClickMovement = async (props: MovementHandlerProps) => {
         const newPenguin: Penguin = { ...penguin, currentPos: [newX, newY] }
         const response = await setPenguinData(penguinId, newPenguin)
         console.log(response)
+
+        //TODO: publish changes
 
         return response
     }
@@ -97,4 +120,8 @@ debugger;
 console.log(await movementHandler({ penguinId: "bruno", clickDestPos: [3, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
 console.log('new penguin after click:', await getPenguinData('bruno'))
 console.log(await movementHandler({ penguinId: "bruno", clickDestPos: [3, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
-console.log('new penguin after click:', await getPenguinData('bruno'))   
+console.log('new penguin after click:', await getPenguinData('bruno'))
+
+
+// don't use await
+// check and see if the penguin has reached the destination - and if so, set it to null
