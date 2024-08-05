@@ -10,3 +10,23 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
     console.log(`Listening on port ${port}...`);
 });
+
+
+// worker
+
+var gameState = 0;
+
+let gameWorker;
+
+if (gameWorker) {
+    clearInterval(gameWorker);
+}
+
+function incrementGameState() {
+    gameState++;
+}
+
+gameWorker = setInterval(function () {
+    console.log("Game state:", gameState);
+    incrementGameState()
+}, 100);
