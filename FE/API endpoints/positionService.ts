@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:9000';
 
-interface Point {
+interface Position {
     x: number;
     y: number;
 }
@@ -21,7 +21,7 @@ export const initializePlayer = async () => {
 };
 
 // Function to fetch room data
-export const getRoomData = async (): Promise<Point[]> => {
+export const getRoomData = async (): Promise<Position[]> => {
     try {
         const response = await axios.get(`${API_URL}/get-room-data`);
         return response.data;
@@ -31,27 +31,27 @@ export const getRoomData = async (): Promise<Point[]> => {
     }
 };
 
-// Function to update position
-export const updatePosition = async (userId: string, position: { x: number, y: number }) => {
+// Function to update Position
+export const updatePosition = async (id: string, Position: { x: number, y: number }) => {
     try {
         const response = await axios.post(`${API_URL}/update-position`, {
-            userId,
-            position
+            id,
+            Position
         });
         return response.data;
     } catch (error) {
-        console.error('Error updating position:', error);
+        console.error('Error updating Position:', error);
         throw error;
     }
 };
 
-// Function to get position
-export const getPosition = async (userId: string) => {
+// Function to get Position
+export const getPosition = async (id: string) => {
     try {
-        const response = await axios.get(`${API_URL}/get-position/${userId}`);
+        const response = await axios.get(`${API_URL}/get-position/${id}`);
         return response.data;
     } catch (error) {
-        console.error('Error getting position:', error);
+        console.error('Error getting Position:', error);
         throw error;
     }
 };

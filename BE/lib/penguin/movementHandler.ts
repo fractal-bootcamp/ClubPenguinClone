@@ -1,5 +1,5 @@
 // this function takes in a penguin object
-// and the new position that's been proprosed
+// and the new Position that's been proprosed
 // it actually checks if what was sent was a 
 // and returns 
 
@@ -8,7 +8,7 @@ import redis from "../../utils/redisClient";
 import { getPenguinData, setPenguinData } from "../../utils/redisOps";
 
 
-type MovementHandlerProps = {
+export type MovementHandlerProps = {
     penguinId: string;
     clickDestPos: [number, number] | null,
     clickOriginPos: [number, number] | null
@@ -46,7 +46,7 @@ const handleClickMovement = async (props: MovementHandlerProps) => {
         const newY = await calculateNewDim(currY, destY)
 
         // TODO: set the orientation of the penguin through the comparison of 
-        // current and destination positions
+        // current and destination Positions
 
         const newPenguin: Penguin = { ...penguin, currentPos: [newX, newY] }
         const response = await setPenguinData(penguinId, newPenguin)

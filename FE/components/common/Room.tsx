@@ -5,80 +5,122 @@ import {
   getPosition,
   updatePosition,
   initializePlayer,
-} from "../../API endpoints/positionService";
+} from "../../API endPositions/PositionService";
 
-interface Point {
+interface Position {
   x: number;
   y: number;
 }
 
-//For the future: Room will take as props the coordinates defined by the room's entry point
-
 const Room = () => {
-  //starting perfect point according to golden proportion
-  const [position, setPosition] = useState<Point>({ x: 618, y: 618 });
-  //new position
-  const [newPosition, setNewPosition] = useState<Point | null>(null);
-  const [room, setRoom] = useState<Point[] | void>([]);
+  const [Position, setPosition] = useState<Position>({ x: 618, y: 618 });
+  const [newPosition, setNewPosition] = useState<Position | null>(null);
+  const [room, setRoom] = useState<Position[] | void>([]);
+  const [lastValidPosition, setLastValidPosition] = useState<Position | null>(
+    null
+  );
+  const [canMove, setCanMove] = useState<boolean>(false); // New state to track if user can move
+  const [isMoving, setIsMoving] = useState<boolean>(false);
 
-  //hard-coded userId
-  const userId = "string";
+  const id = "string";
 
   const fetchRoom = async () => {
     try {
       await initializePlayer(); // Initialize player in backend
       const roomData = await getRoomData(); // Fetch room data from backend
-      setRoom(roomData);
+      setRoom(roomData); // Set room data
     } catch (error) {
       console.error("Error initializing room:", error);
     }
   };
 
-  // Function to fetch player position
+  // Function to fetch player Position
   const fetchPosition = async () => {
     try {
-      const positionData = await getPosition(userId);
-      setPosition(positionData);
+      const PositionData = await getPosition(id);
+      setPosition(PositionData);
+      setLastValidPosition(PositionData); // Initialize lastValidPosition
+      console.log("lastValidPosition", lastValidPosition);
     } catch (error) {
-      console.error("Error fetching position:", error);
+      console.error("Error fetching Position:", error);
     }
   };
 
-  // Fetch room and position on component mount
   useEffect(() => {
     fetchRoom();
     fetchPosition();
   }, []);
 
-  // Handle canvas click event to update position
-  const handleCanvasClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const isWithinRadius = (
+    Position1: Position,
+    Position2: Position,
+    radius: number
+  ) => {
+    const distance = Math.sqrt(
+      (Position1.x - Position2.x) ** 2 + (Position1.y - Position2.y) ** 2
+    );
+    return distance <= radius;
+  };
+
+  const handleCanvasClick = async (event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const x = Math.floor(event.clientX - rect.left);
     const y = Math.floor(event.clientY - rect.top);
-    const newPos = { x, y };
-    setNewPosition(newPos);
+    const clickedPos = { x, y };
 
-    if (newPos) {
-      updatePosition(userId, newPos);
-      setPosition(newPos); // Update local state with new position
+    if (isWithinRadius(clickedPos, Position, 10)) {
+      // User clicked within 5px of the current Position
+      setCanMove(true);
+      setIsMoving(false);
+      console.log("Penguin selected. You can now move.");
+    } else if (canMove && !isMoving) {
+      setIsMoving(true);
+      setNewPosition(clickedPos);
+      moveTowardsDestination(clickedPos);
+    } else if (!canMove) {
+      console.log("You must click the penguin first!");
     }
-
-    console.log("Clicked coordinates", newPos);
   };
+
+  const moveTowardsDestination = async (destination: Position) => {
+    while (Position.x !== destination.x || Position.y !== destination.y) {
+      try {
+        console.log("new Position towards", destination);
+        const newPos = await updatePosition(id, destination);
+        setPosition(newPos);
+        setLastValidPosition(newPos);
+
+        if (newPos.x === destination.x && newPos.y === destination.y) {
+          setCanMove(false);
+          setIsMoving(false);
+          console.log("Reached destination:", newPos);
+          break;
+        }
+
+        // Add a small delay to visualize the movement
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      } catch (error) {
+        console.error("Error updating Position:", error);
+        setIsMoving(false);
+        break;
+      }
+    }
+  };
+
   return (
     <>
       <div
         className="canvas"
         onClick={handleCanvasClick}
-        style={{ width: "1000px", height: "1000px", position: "relative" }}
+        style={{ width: "1000px", height: "1000px", Position: "relative" }}
       >
-        {position && (
+        {Position && (
           <div
-            className="position-marker"
+            className="Position-marker"
             style={{
-              position: "absolute",
-              left: `${position.x}px`,
-              top: `${position.y}px`,
+              Position: "absolute",
+              left: `${Position.x}px`,
+              top: `${Position.y}px`,
               width: "10px",
               height: "10px",
               backgroundColor: "red",
@@ -87,11 +129,16 @@ const Room = () => {
           />
         )}
       </div>
-      {position && (
+      {Position && (
         <p>
-          Clicked position: x={position.x}, y={position.y}
+          Current Position: x={Position.x}, y={Position.y}
         </p>
       )}
+      <p>
+        {canMove
+          ? "You can now click anywhere to move."
+          : "Click near the current Position to enable movement."}
+      </p>
     </>
   );
 };

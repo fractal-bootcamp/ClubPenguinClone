@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { updatePosition, getPosition, getRoomData, initializePlayer, storeInitialGameState } from './controllers/positionController'
+import { updatePosition, getPosition, getRoomData, initializePlayer, storeInitialGameState } from './controllers/PositionController'
 
 
 const app = express();
@@ -16,7 +16,7 @@ app.use(cors({
 
 router.post('/initialize-player', initializePlayer);
 router.post('/update-position', updatePosition);
-router.get('/get-position/:userId', getPosition);
+router.get('/get-position/:id', getPosition);
 router.get('/get-room-data', getRoomData)
 
 
