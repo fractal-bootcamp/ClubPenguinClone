@@ -21,8 +21,8 @@ const Room = () => {
   const [newPosition, setNewPosition] = useState<Point | null>(null);
   const [room, setRoom] = useState<Point[] | void>([]);
 
-  //hard-coded userId
-  const userId = "string";
+  //hard-coded penguinId
+  const penguinId = "brodie";
 
   const fetchRoom = async () => {
     try {
@@ -37,17 +37,25 @@ const Room = () => {
   // Function to fetch player position
   const fetchPosition = async () => {
     try {
-      const positionData = await getPosition(userId);
+      const positionData = await getPosition(penguinId);
       setPosition(positionData);
     } catch (error) {
       console.error("Error fetching position:", error);
     }
   };
 
-  // Fetch room and position on component mount
+  // Fetch room on component mount
   useEffect(() => {
     fetchRoom();
-    fetchPosition();
+  }, []);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchPosition();
+    }, 100);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   // Handle canvas click event to update position
@@ -56,11 +64,9 @@ const Room = () => {
     const x = Math.floor(event.clientX - rect.left);
     const y = Math.floor(event.clientY - rect.top);
     const newPos = { x, y };
-    setNewPosition(newPos);
 
     if (newPos) {
-      updatePosition(userId, newPos);
-      setPosition(newPos); // Update local state with new position
+      updatePosition(penguinId, newPos);
     }
 
     console.log("Clicked coordinates", newPos);
