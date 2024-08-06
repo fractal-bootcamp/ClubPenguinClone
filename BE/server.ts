@@ -55,4 +55,9 @@ function incrementGameState() {
 gameWorker = setInterval(function () {
     console.log("Game state:", gameState);
     incrementGameState()
+
+
+
+
+
 }, 100);
