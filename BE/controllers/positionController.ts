@@ -104,13 +104,14 @@ export const updatePosition = async (req: Request, res: Response) => {
         const x = position.x;
         const y = position.y;
 
-        movementInputHandler({ penguinId: penguinId, clickDestPos: [x, y], arrowKeyPressed: null })
+        const result = await movementInputHandler({ penguinId: penguinId, clickDestPos: [x, y], arrowKeyPressed: null })
 
-        if (result) {
-            res.status(200).json({ message: 'Position updated successfully', newPosition: result.currentPos });
+        if (!null) {
+            res.status(200).json({ message: 'Position updated successfully' });
         } else {
             res.status(400).json({ error: 'Unable to update Position' });
         }
+
     } catch (error) {
         console.error('Error updating Position:', error);
         res.status(500).json({ error: 'Internal server error' });
