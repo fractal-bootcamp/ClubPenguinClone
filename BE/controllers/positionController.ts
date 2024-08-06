@@ -1,9 +1,12 @@
 import type { Request, Response } from 'express';
-import redisClient from '../redisClient'
-import { Penguin } from '../lib/penguin/types';
-import { getPenguinData } from '../utils/redisOps';
-import { movementHandler } from '../lib/penguin/movementHandler';
 
+
+import { getPenguinData, setPenguinData } from '../lib/utils/redisOps';
+import { Penguin } from '../lib/penguin/types';
+import { randomUUID } from 'crypto';
+import { generateRandomColor } from '../lib/utils/generateRandomColor';
+import { movementInputHandler } from '../lib/penguin/movementHandler';
+import redis from '../lib/utils/redisClient';
 
 type MovementHandlerProps = {
     penguinId: string;
@@ -12,17 +15,10 @@ type MovementHandlerProps = {
     arrowKeyPressed: string | null;
 }
 
-
 interface Position {
     x: number;
     y: number;
 }
-
-interface Position {
-    x: number;
-    y: number;
-}
-
 
 interface GameState {
     roomName: string;
@@ -33,9 +29,9 @@ interface GameState {
 }
 
 
-//hard-coded id
+//hard-coded penguinId
 
-const id: string = 'bruno'
+const penguinId: string = 'string'
 
 
 // Generating room
@@ -53,17 +49,18 @@ export const generateRoom = (width: number, height: number): Position[] => {
 
 
 export const initializePlayer = async (req: Request, res: Response) => {
-    // for the future: do id
+    // for the future: do penguinId
 
     //connect with redis client for real
     try {
         const initialPosition: Position = { x: 618, y: 618 };
-        await redisClient.hSet(`user:${id}:Position`, {
-            x: initialPosition.x.toString(),
-            y: initialPosition.y.toString()
-        });
-        res.status(200).json({ message: 'Player initialized with default Position or already set' });
-        console.log("initial Position", initialPosition)
+        const newId = randomUUID(); // Generate a new UUID for the penguin
+        const randomColor = generateRandomColor();
+        const newPenguin: Penguin = { id: newId, color: randomColor, name: "DUMMY_NAME", email: "DUMMY_EMAIL", currentPos: [initialPosition.x, initialPosition.y], clickDestPos: null, clickOriginPos: null, arrowKeyPressed: null };
+        await setPenguinData(newId, newPenguin);
+
+        res.status(200).json({ message: 'Player initialized with default position or already set' });
+        console.log("initial position", initialPosition)
     } catch (error) {
         console.error('Error initializing player:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -75,7 +72,7 @@ export const initializePlayer = async (req: Request, res: Response) => {
 export const storeInitialGameState = async () => {
     try {
         console.log('Storing initial game state...');
-        await redisClient.set('game:state:Room0', JSON.stringify({
+        await redis.set('game:state:Room0', JSON.stringify({
             roomName: 'Room0',
             coordinates: generateRoom(1000, 1000),
             status: 'ongoing',
@@ -92,23 +89,22 @@ export const storeInitialGameState = async () => {
 
 export const updatePosition = async (req: Request, res: Response) => {
     try {
-        const { id, Position }: { id: string, Position: Position } = req.body;
+        // const { penguinId, position }: { penguinId: string, position: Position } = req.body;
 
-        if (!id || !Position || typeof Position.x !== 'number' || typeof Position.y !== 'number') {
+        const penguinId = 'brodie'
+        const { position }: { position: Position } = req.body;
+
+
+        if (!penguinId || !position || typeof position.x !== 'number' || typeof position.y !== 'number') {
             return res.status(400).json({ error: 'Invalid input' });
         }
 
-        const penguin = await getPenguinData(id);
-        if (!penguin) {
-            return res.status(404).json({ error: 'Penguin not found' });
-        }
+        // Store position
+        // Hash
+        const x = position.x;
+        const y = position.y;
 
-        const result = await movementHandler({
-            penguinId: id,
-            clickDestPos: [Position.x, Position.y],
-            clickOriginPos: penguin.currentPos,
-            arrowKeyPressed: null
-        });
+        movementInputHandler({ penguinId: penguinId, clickDestPos: [x, y], arrowKeyPressed: null })
 
         if (result) {
             res.status(200).json({ message: 'Position updated successfully', newPosition: result.currentPos });
@@ -124,17 +120,19 @@ export const updatePosition = async (req: Request, res: Response) => {
 //Function to get the Position
 export const getPosition = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
-        const Position = await redisClient.hGetAll(`user:${id}:Position`);
+        const { penguinId } = req.params;
+        const penguin = await getPenguinData(penguinId)
+        if (!penguin) return res.status(404).json({ error: 'Penguin not found' });
+        const position = penguin.currentPos
 
-        if (!Position.x || !Position.y) {
+        if (!position) {
             return res.status(404).json({ error: 'Position not found' });
         }
 
 
-        res.status(200).json({
-            x: parseInt(Position.x),
-            y: parseInt(Position.y)
+        return res.status(200).json({
+            x: position[0],
+            y: position[1]
         })
     }
     catch (error) {
@@ -148,7 +146,7 @@ export const getRoomData = async (): Promise<Position[]> => {
     try {
 
         //Since Room0 is the beta one, this will be hardcoded
-        const roomData = await redisClient.get('game:state:Room0');
+        const roomData = await redis.get('game:state:Room0');
         if (!roomData) {
             throw new Error('No room data found');
         }

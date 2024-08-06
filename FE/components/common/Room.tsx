@@ -42,7 +42,8 @@ const Room = () => {
   const [head, setHead] = useState(headSprite);
   const [weapon, setWeapon] = useState(weaponSprite);
 
-  const id = "string";
+  //hard-coded penguinId
+  const penguinId = "brodie";
 
   const fetchRoom = async () => {
     try {
@@ -57,21 +58,28 @@ const Room = () => {
   // Function to fetch player Position
   const fetchPosition = async () => {
     try {
-      const PositionData = await getPosition(id);
-      setPosition(PositionData);
-      setLastValidPosition(PositionData); // Initialize lastValidPosition
-      console.log("lastValidPosition", lastValidPosition);
+      const positionData = await getPosition(penguinId);
+      setPosition(positionData);
     } catch (error) {
       console.error("Error fetching Position:", error);
     }
   };
 
+  // Fetch room on component mount
   useEffect(() => {
     fetchRoom();
-    fetchPosition();
   }, []);
 
-  const isWithinRadius = (
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchPosition();
+    }, 100);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const clickIsAvatarArea = (
     Position1: Position,
     Position2: Position,
     radius: number
@@ -88,73 +96,31 @@ const Room = () => {
     const y = Math.floor(event.clientY - rect.top);
     const clickedPos = { x, y };
 
-    if (isWithinRadius(clickedPos, position, 50)) {
+    if (clickIsAvatarArea(clickedPos, position, 50)) {
       // User clicked within X px of the current Position
       setCanMove(true);
-      setIsMoving(false);
       console.log("Penguin selected. You can now move.");
-    } else if (canMove && !isMoving) {
-      setIsMoving(true);
-      setNewPosition(clickedPos);
-      moveTowardsDestination(clickedPos);
+    } else if (canMove && clickedPos) {
+      setCanMove(false);
+      updatePosition(penguinId, clickedPos);
     } else if (!canMove) {
       console.log("You must click the penguin first!");
     }
   };
 
   const handleMarkerClick = async (markerPosition: Position) => {
-    if (isWithinRadius(markerPosition, position, 50)) {
-      // User clicked within X px of the current Position
-      setCanMove(true);
-      setIsMoving(false);
-      console.log("Marker selected. You can now move.");
-    } else if (canMove && !isMoving) {
-      setIsMoving(true);
-      setNewPosition(markerPosition);
-      moveTowardsDestination(markerPosition);
-    } else if (!canMove) {
-      console.log("You must click the marker first!");
-    }
-  };
-
-  const moveTowardsDestination = async (destination: Position) => {
-    while (position.x !== destination.x || position.y !== destination.y) {
-      try {
-        console.log("new Position towards", destination);
-        const newPos = await updatePosition(id, destination);
-        setPosition(newPos);
-        setLastValidPosition(newPos);
-
-        // Update direction
-        const dx = destination.x - position.x;
-        const dy = destination.y - position.y;
-        let newDirection;
-        if (Math.abs(dx) > Math.abs(dy)) {
-          newDirection = dx > 0 ? 2 : 6; // East or West
-        } else {
-          newDirection = dy > 0 ? 4 : 0; // South or North
-        }
-        setDirection(newDirection);
-
-        // Update frame
-        setFrame((prevFrame) => (prevFrame + 1) % 8);
-
-        if (newPos.x === destination.x && newPos.y === destination.y) {
-          setCanMove(false);
-          setIsMoving(false);
-          setFrame(0); // Reset to standing frame
-          console.log("Reached destination:", newPos);
-          break;
-        }
-
-        // Add a small delay to visualize the movement
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      } catch (error) {
-        console.error("Error updating Position:", error);
-        setIsMoving(false);
-        break;
-      }
-    }
+    // if (clickIsAvatarArea(markerPosition, position, 50)) {
+    //   // User clicked within X px of the current Position
+    //   setCanMove(true);
+    //   setIsMoving(false);
+    //   console.log("Marker selected. You can now move.");
+    // } else if (canMove && !isMoving) {
+    //   setIsMoving(true);
+    //   setNewPosition(markerPosition);
+    //   moveTowardsDestination(markerPosition);
+    // } else if (!canMove) {
+    //   console.log("You must click the marker first!");
+    // }
   };
 
   return (
