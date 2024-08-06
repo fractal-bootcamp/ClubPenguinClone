@@ -44,10 +44,18 @@ const Room = () => {
     }
   };
 
-  // Fetch room and position on component mount
+  // Fetch room on component mount
   useEffect(() => {
     fetchRoom();
-    fetchPosition();
+  }, []);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchPosition();
+    }, 100);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   // Handle canvas click event to update position
@@ -56,11 +64,9 @@ const Room = () => {
     const x = Math.floor(event.clientX - rect.left);
     const y = Math.floor(event.clientY - rect.top);
     const newPos = { x, y };
-    setNewPosition(newPos);
 
     if (newPos) {
       updatePosition(userId, newPos);
-      setPosition(newPos); // Update local state with new position
     }
 
     console.log("Clicked coordinates", newPos);

@@ -47,8 +47,11 @@ export const updatePosition = async (userId: string, position: { x: number, y: n
 
 // Function to get position
 export const getPosition = async (userId: string) => {
+    const fakeUserId = 'brodie'
     try {
-        const response = await axios.get(`${API_URL}/get-position/${userId}`);
+        console.log('doing a get request')
+        const response = await axios.get(`${API_URL}/get-position/${fakeUserId}`);
+        console.log('got response', response)
         return response.data;
     } catch (error) {
         console.error('Error getting position:', error);
