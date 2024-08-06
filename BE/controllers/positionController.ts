@@ -1,5 +1,10 @@
 import type { Request, Response } from 'express';
-import redisClient from '../lib/utils/redisClient'
+import { getPenguinData, setPenguinData } from '../lib/utils/redisOps';
+import { Penguin } from '../lib/penguin/types';
+import { randomUUID } from 'crypto';
+import { generateRandomColor } from '../lib/utils/generateRandomColor';
+import { movementInputHandler } from '../lib/penguin/movementHandler';
+import redis from '../lib/utils/redisClient';
 
 
 interface Position {
@@ -46,10 +51,11 @@ export const initializePlayer = async (req: Request, res: Response) => {
 
     try {
         const initialPosition: Position = { x: 618, y: 618 };
-        await redisClient.hSet(`user:${userId}:position`, {
-            x: initialPosition.x.toString(),
-            y: initialPosition.y.toString()
-        });
+        const newId = randomUUID(); // Generate a new UUID for the penguin
+        const randomColor = generateRandomColor();
+        const newPenguin: Penguin = { id: newId, color: randomColor, name: "DUMMY_NAME", email: "DUMMY_EMAIL", currentPos: [initialPosition.x, initialPosition.y], clickDestPos: null, clickOriginPos: null, arrowKeyPressed: null };
+        await setPenguinData(newId, newPenguin);
+
         res.status(200).json({ message: 'Player initialized with default position or already set' });
         console.log("initial position", initialPosition)
     } catch (error) {
@@ -63,7 +69,7 @@ export const initializePlayer = async (req: Request, res: Response) => {
 export const storeInitialGameState = async () => {
     try {
         console.log('Storing initial game state...');
-        await redisClient.set('game:state:Room0', JSON.stringify({
+        await redis.set('game:state:Room0', JSON.stringify({
             roomName: 'Room0',
             coordinates: generateRoom(1000, 1000),
             status: 'ongoing',
@@ -80,18 +86,21 @@ export const storeInitialGameState = async () => {
 
 export const updatePosition = async (req: Request, res: Response) => {
     try {
-        const { userId, position }: { userId: string, position: Position } = req.body;
+        // const { userId, position }: { userId: string, position: Position } = req.body;
 
-        if (!userId || !position || typeof position.x !== 'number' || typeof position.y !== 'number') {
+        const penguinId = 'brodie'
+        const { position }: { position: Position } = req.body;
+
+        if (!penguinId || !position || typeof position.x !== 'number' || typeof position.y !== 'number') {
             return res.status(400).json({ error: 'Invalid input' });
         }
 
         // Store position
         // Hash
-        await redisClient.hSet(`user:${userId}:position`, {
-            x: position.x.toString(),
-            y: position.y.toString()
-        });
+        const x = position.x;
+        const y = position.y;
+
+        movementInputHandler({ penguinId: penguinId, clickDestPos: [x, y], arrowKeyPressed: null })
 
         res.status(200).json({ message: 'Position updated successfully' });
     } catch (error) {
@@ -104,16 +113,17 @@ export const updatePosition = async (req: Request, res: Response) => {
 export const getPosition = async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
-        const position = await redisClient.hGetAll(`user:${userId}:position`);
+        const penguin = await getPenguinData(userId)
+        const position = penguin?.currentPos
 
-        if (!position.x || !position.y) {
+        if (!position) {
             return res.status(404).json({ error: 'Position not found' });
         }
 
 
         res.status(200).json({
-            x: parseInt(position.x),
-            y: parseInt(position.y)
+            x: position[0],
+            y: position[1]
         })
     }
     catch (error) {
@@ -126,7 +136,7 @@ export const getRoomData = async (): Promise<Point[]> => {
     try {
 
         //Since Room0 is the beta one, this will be hardcoded
-        const roomData = await redisClient.get('game:state:Room0');
+        const roomData = await redis.get('game:state:Room0');
         if (!roomData) {
             throw new Error('No room data found');
         }
