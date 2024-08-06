@@ -43,7 +43,7 @@ const Room = () => {
   const [weapon, setWeapon] = useState(weaponSprite);
 
   //hard-coded penguinId
-  const penguinId = "brodie";
+  const penguinId = "cd5f144b-af4d-46cf-8506-29cfb25aea9e";
 
   const fetchRoom = async () => {
     try {

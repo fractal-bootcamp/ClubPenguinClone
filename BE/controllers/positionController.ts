@@ -89,11 +89,7 @@ export const storeInitialGameState = async () => {
 
 export const updatePosition = async (req: Request, res: Response) => {
     try {
-        // const { penguinId, position }: { penguinId: string, position: Position } = req.body;
-
-        const penguinId = 'brodie'
-        const { position }: { position: Position } = req.body;
-
+        const { penguinId, position }: { penguinId: string, position: Position } = req.body;
 
         if (!penguinId || !position || typeof position.x !== 'number' || typeof position.y !== 'number') {
             return res.status(400).json({ error: 'Invalid input' });
