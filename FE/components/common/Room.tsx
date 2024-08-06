@@ -52,7 +52,7 @@ const Room = () => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       fetchPosition();
-    }, 1500);
+    }, 100);
 
     // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
