@@ -89,7 +89,7 @@ const doClickMovementStep = async (penguinId: string) => {
         // TODO: set the orientation of the penguin through the comparison of 
         // current and destination positions
         const updatedPenguin: Penguin = { ...penguin, currentPos: [newX, newY] }
-        if (newX === destX && newY === destY) {
+        if (checkIfDestinationIsReached(currX, destX) && checkIfDestinationIsReached(currY, destY)) {
             updatedPenguin.clickDestPos = null;
             updatedPenguin.clickOriginPos = null;
         }
@@ -109,12 +109,23 @@ const doClickMovementStep = async (penguinId: string) => {
 // 0,0 -> 3, 1
 // 1,0
 
+const checkIfDestinationIsReached = (currDim, destDim) => {
+    if (destDim > currDim - 5 && destDim < currDim + 5) {
+        return true
+    }
+    else {
+        return false
+    }
+}
+
 const calculateNewDim = (currDim, destDim) => {
     if (destDim > currDim) {
-        return currDim + 1
+        const diff = destDim - currDim
+        return currDim + 0.1 * diff
     }
     else if (destDim < currDim) {
-        return currDim - 1
+        const diff = currDim - destDim
+        return currDim - 0.1 * diff
     }
     else {
         return currDim

@@ -17,7 +17,7 @@ app.use(cors({
 
 router.post('/initialize-player', initializePlayer);
 router.post('/update-position', updatePosition);
-router.get('/get-position/:userId', getPosition);
+router.get('/get-position/:penguinId', getPosition);
 router.get('/get-room-data', getRoomData)
 
 

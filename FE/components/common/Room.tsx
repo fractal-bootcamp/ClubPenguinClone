@@ -21,8 +21,8 @@ const Room = () => {
   const [newPosition, setNewPosition] = useState<Point | null>(null);
   const [room, setRoom] = useState<Point[] | void>([]);
 
-  //hard-coded userId
-  const userId = "string";
+  //hard-coded penguinId
+  const penguinId = "brodie";
 
   const fetchRoom = async () => {
     try {
@@ -37,7 +37,7 @@ const Room = () => {
   // Function to fetch player position
   const fetchPosition = async () => {
     try {
-      const positionData = await getPosition(userId);
+      const positionData = await getPosition(penguinId);
       setPosition(positionData);
     } catch (error) {
       console.error("Error fetching position:", error);
@@ -66,7 +66,7 @@ const Room = () => {
     const newPos = { x, y };
 
     if (newPos) {
-      updatePosition(userId, newPos);
+      updatePosition(penguinId, newPos);
     }
 
     console.log("Clicked coordinates", newPos);
