@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import redisClient from '../redisClient'
+import redisClient from '../lib/utils/redisClient'
 
 
 interface Position {

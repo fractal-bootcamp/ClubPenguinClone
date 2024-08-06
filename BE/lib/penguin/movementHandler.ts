@@ -94,7 +94,7 @@ const doClickMovementStep = async (penguinId: string) => {
             updatedPenguin.clickOriginPos = null;
         }
         const response = await setPenguinData(penguinId, updatedPenguin)
-        console.log(response)
+        console.log("logging new position:", await getPenguinData(penguinId))
 
         //TODO: publish changes?
 
@@ -125,28 +125,18 @@ const handleArrowKeyMovement = () => {
 
 }
 
-const testPenguin: Penguin = {
-    id: 'brodie',
-    email: 'test@test.com',
-    name: 'test',
-    color: 'red',
-    currentPos: [0, 0],
-    clickDestPos: null,
-    clickOriginPos: null,
-    arrowKeyPressed: null
-}
+// const testPenguin: Penguin = {
+//     id: 'brodie',
+//     email: 'test@test.com',
+//     name: 'test',
+//     color: 'red',
+//     currentPos: [0, 0],
+//     clickDestPos: null,
+//     clickOriginPos: null,
+//     arrowKeyPressed: null
+// }
 
-console.log('initial penguin:', testPenguin)
-await setPenguinData('brodie', testPenguin)
-debugger;
+// console.log('initial penguin:', testPenguin)
+// await setPenguinData('brodie', testPenguin)
+// debugger;
 
-console.log(await movementInputHandler({ penguinId: "brodie", clickDestPos: [3, 1], arrowKeyPressed: null }))
-console.log('new penguin after step 1:', await getPenguinData('brodie'))
-console.log(await movementInputHandler({ penguinId: "brodie", clickDestPos: [3, 1], arrowKeyPressed: null }))
-console.log('new penguin after step 2:', await getPenguinData('brodie'))
-console.log(await movementInputHandler({ penguinId: "brodie", clickDestPos: [3, 1], arrowKeyPressed: null }))
-console.log('new penguin after step 3:', await getPenguinData('brodie'))
-
-
-// don't use await
-// check and see if the penguin has reached the destination - and if so, set it to null

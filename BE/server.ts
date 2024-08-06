@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { updatePosition, getPosition, getRoomData, initializePlayer, storeInitialGameState } from './controllers/positionController'
+import { moveAllMovingPenguins } from "./lib/penguin/moveAllMovingPenguins";
 
 
 const app = express();
@@ -14,10 +15,10 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'] // Allow specific headers
 }));
 
-router.post('/initialize-player', initializePlayer);
-router.post('/update-position', updatePosition);
-router.get('/get-position/:userId', getPosition);
-router.get('/get-room-data', getRoomData)
+// router.post('/initialize-player', initializePlayer);
+// router.post('/update-position', updatePosition);
+// router.get('/get-position/:userId', getPosition);
+// router.get('/get-room-data', getRoomData)
 
 
 //Initialize the game state when the server starts
@@ -55,9 +56,5 @@ function incrementGameState() {
 gameWorker = setInterval(function () {
     console.log("Game state:", gameState);
     incrementGameState()
-
-
-
-
-
-}, 100);
+    moveAllMovingPenguins()
+}, 2000);
