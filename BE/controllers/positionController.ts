@@ -27,9 +27,9 @@ interface GameState {
 }
 
 
-//hard-coded userId
+//hard-coded penguinId
 
-const userId: string = 'string'
+const penguinId: string = 'string'
 
 
 // Generating room
@@ -47,7 +47,7 @@ export const generateRoom = (width: number, height: number): Point[] => {
 
 
 export const initializePlayer = async (req: Request, res: Response) => {
-    // for the future: do userId
+    // for the future: do penguinId
 
     try {
         const initialPosition: Position = { x: 618, y: 618 };
@@ -86,7 +86,7 @@ export const storeInitialGameState = async () => {
 
 export const updatePosition = async (req: Request, res: Response) => {
     try {
-        // const { userId, position }: { userId: string, position: Position } = req.body;
+        // const { penguinId, position }: { penguinId: string, position: Position } = req.body;
 
         const penguinId = 'brodie'
         const { position }: { position: Position } = req.body;
@@ -113,8 +113,8 @@ export const updatePosition = async (req: Request, res: Response) => {
 //Function to get the position
 export const getPosition = async (req: Request, res: Response) => {
     try {
-        const { userId } = req.params;
-        const penguin = await getPenguinData(userId)
+        const { penguinId } = req.params;
+        const penguin = await getPenguinData(penguinId)
         if (!penguin) return res.status(404).json({ error: 'Penguin not found' });
         const position = penguin.currentPos
 

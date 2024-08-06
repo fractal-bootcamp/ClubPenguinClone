@@ -32,10 +32,10 @@ export const getRoomData = async (): Promise<Point[]> => {
 };
 
 // Function to update position
-export const updatePosition = async (userId: string, position: { x: number, y: number }) => {
+export const updatePosition = async (penguinId: string, position: { x: number, y: number }) => {
     try {
         const response = await axios.post(`${API_URL}/update-position`, {
-            userId,
+            penguinId,
             position
         });
         return response.data;
@@ -46,11 +46,10 @@ export const updatePosition = async (userId: string, position: { x: number, y: n
 };
 
 // Function to get position
-export const getPosition = async (userId: string) => {
-    const fakeUserId = 'brodie'
+export const getPosition = async (penguinId: string) => {
     try {
         console.log('doing a get request')
-        const response = await axios.get(`${API_URL}/get-position/${fakeUserId}`);
+        const response = await axios.get(`${API_URL}/get-position/${penguinId}`);
         console.log('got response', response)
         return response.data;
     } catch (error) {
