@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
 import "./Room.css";
+
+//API
 import {
   getRoomData,
   getPosition,
   updatePosition,
   initializePlayer,
-} from "../../API endPositions/PositionService";
+} from "../../API endpoints/positionService";
+
+//Character and sprites
+import Character from "./Character";
+import bodySprite from "../../src/assets/isometric-hero/clothes.png";
+import headSprite from "../../src/assets/isometric-hero/male_head1.png";
+import weaponSprite from "../../src/assets/isometric-hero/shortsword.png";
 
 interface Position {
   x: number;
@@ -13,14 +21,26 @@ interface Position {
 }
 
 const Room = () => {
-  const [Position, setPosition] = useState<Position>({ x: 618, y: 618 });
-  const [newPosition, setNewPosition] = useState<Position | null>(null);
+  //Room
   const [room, setRoom] = useState<Position[] | void>([]);
+
+  //Handling movement
+  const [position, setPosition] = useState<Position>({ x: 528, y: 630 });
+  const [newPosition, setNewPosition] = useState<Position | null>(null);
   const [lastValidPosition, setLastValidPosition] = useState<Position | null>(
     null
   );
   const [canMove, setCanMove] = useState<boolean>(false); // New state to track if user can move
   const [isMoving, setIsMoving] = useState<boolean>(false);
+
+  // Character's movement animation
+  const [direction, setDirection] = useState<number>(0);
+  const [frame, setFrame] = useState<number>(0);
+
+  //Character's characteristics
+  const [body, setBody] = useState(bodySprite);
+  const [head, setHead] = useState(headSprite);
+  const [weapon, setWeapon] = useState(weaponSprite);
 
   const id = "string";
 
@@ -68,8 +88,8 @@ const Room = () => {
     const y = Math.floor(event.clientY - rect.top);
     const clickedPos = { x, y };
 
-    if (isWithinRadius(clickedPos, Position, 10)) {
-      // User clicked within 5px of the current Position
+    if (isWithinRadius(clickedPos, position, 50)) {
+      // User clicked within X px of the current Position
       setCanMove(true);
       setIsMoving(false);
       console.log("Penguin selected. You can now move.");
@@ -82,17 +102,47 @@ const Room = () => {
     }
   };
 
+  const handleMarkerClick = async (markerPosition: Position) => {
+    if (isWithinRadius(markerPosition, position, 50)) {
+      // User clicked within X px of the current Position
+      setCanMove(true);
+      setIsMoving(false);
+      console.log("Marker selected. You can now move.");
+    } else if (canMove && !isMoving) {
+      setIsMoving(true);
+      setNewPosition(markerPosition);
+      moveTowardsDestination(markerPosition);
+    } else if (!canMove) {
+      console.log("You must click the marker first!");
+    }
+  };
+
   const moveTowardsDestination = async (destination: Position) => {
-    while (Position.x !== destination.x || Position.y !== destination.y) {
+    while (position.x !== destination.x || position.y !== destination.y) {
       try {
         console.log("new Position towards", destination);
         const newPos = await updatePosition(id, destination);
         setPosition(newPos);
         setLastValidPosition(newPos);
 
+        // Update direction
+        const dx = destination.x - position.x;
+        const dy = destination.y - position.y;
+        let newDirection;
+        if (Math.abs(dx) > Math.abs(dy)) {
+          newDirection = dx > 0 ? 2 : 6; // East or West
+        } else {
+          newDirection = dy > 0 ? 4 : 0; // South or North
+        }
+        setDirection(newDirection);
+
+        // Update frame
+        setFrame((prevFrame) => (prevFrame + 1) % 8);
+
         if (newPos.x === destination.x && newPos.y === destination.y) {
           setCanMove(false);
           setIsMoving(false);
+          setFrame(0); // Reset to standing frame
           console.log("Reached destination:", newPos);
           break;
         }
@@ -112,26 +162,40 @@ const Room = () => {
       <div
         className="canvas"
         onClick={handleCanvasClick}
-        style={{ width: "1000px", height: "1000px", Position: "relative" }}
+        style={{ width: "2000px", height: "2000px", position: "relative" }}
       >
-        {Position && (
+        {position && (
+          <>
+            <Character
+              x={position.x}
+              y={position.y}
+              direction={direction}
+              frame={isMoving ? frame : 0}
+              body={body}
+              head={head}
+              weapon={weaponSprite}
+              onMarkerClick={handleMarkerClick}
+            />
+          </>
+        )}
+        {/* {position && (
           <div
             className="Position-marker"
             style={{
-              Position: "absolute",
-              left: `${Position.x}px`,
-              top: `${Position.y}px`,
+              position: "absolute",
+              left: `${position.x}px`,
+              top: `${position.y}px`,
               width: "10px",
               height: "10px",
               backgroundColor: "red",
               borderRadius: "50%",
             }}
           />
-        )}
+        )} */}
       </div>
-      {Position && (
+      {position && (
         <p>
-          Current Position: x={Position.x}, y={Position.y}
+          Current Position: x={position.x}, y={position.y}
         </p>
       )}
       <p>

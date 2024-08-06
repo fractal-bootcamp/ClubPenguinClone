@@ -1,0 +1,57 @@
+.main-main {
+    display: flex; /* Assuming you want flex layout for children */
+    flex-direction: row;
+  }
+  
+  .save-screen {
+    width: 1000px;
+    height: 1000px;
+    background-color: rgb(16, 0, 0);
+    position: relative; /* Set positioning context for absolute positioning of elements */
+  }
+  
+  .image-container {
+    position: relative; /* Ensure title and NavBar can be positioned inside this container */
+    max-width: 100%; /* Ensure the container takes up the full width available */
+    max-height: 100%; /* Ensure the container takes up the full height of the parent */
+    width: 100%; /* Full width of the save-screen */
+    height: 100%; /* Full height of the save-screen */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Hide overflow of image */
+  }
+  
+  .image-container img {
+    max-width: 100%; /* Ensure image fits within container */
+    max-height: 100%; /* Ensure image fits within container */
+    object-fit: cover; /* Maintain aspect ratio while resizing image */
+  }
+  
+  .title-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the title container */
+    text-align: center; /* Center text */
+  }
+  
+  .main-font {
+    color: white; /* Ensure the title is visible against the image */
+    font-family: 'UnifrakturCook', serif; /* Apply the custom font */
+    font-weight: 700; /* Apply the desired font weight */
+    font-size: 2rem; /* Adjust the size as needed */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Optional: Add shadow for better readability */
+    cursor: pointer; /* Indicate clickable area */
+  }
+  
+  .navbar-container {
+    margin-top: 20px; /* Position the NavBar 20px below the title */
+    border: 1px solid white; /* White border around the NavBar */
+    padding: 10px; /* Add some padding for spacing */
+    background: transparent; /* Ensure background is transparent or adjust as needed */
+    color: white; /* Set text color inside NavBar to white */
+    font-family: 'UnifrakturCook', serif; /* Apply the same custom font as title */
+    font-weight: 700; /* Apply the same font weight as title */
+  }
+  
