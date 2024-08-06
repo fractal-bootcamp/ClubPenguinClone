@@ -11,7 +11,6 @@ import { getPenguinData, setPenguinData } from "../utils/redisOps";
 type MovementHandlerProps = {
     penguinId: string;
     clickDestPos: [number, number] | null,
-    clickOriginPos: [number, number] | null
     arrowKeyPressed: string | null
 }
 
@@ -19,9 +18,9 @@ type MovementHandlerProps = {
 // then process it as a clik
 
 
-export const movementHandler = (props: MovementHandlerProps) => {
 
-
+// will this cause a problem if async 
+export const movementHandler = async ({ penguinId, clickDestPos, arrowKeyPressed }: MovementHandlerProps) => {
 
     // movement handler 
     // give me all the penguins that have a difference between their current position 
@@ -40,13 +39,24 @@ export const movementHandler = (props: MovementHandlerProps) => {
     // once the destination has been reached, set the destination to null again
     // 
 
+    const penguin = await getPenguinData(penguinId)
+    if (!penguin) return null
 
-    if (props.clickDestPos) {
-        const response = handleClickMovement(props)
+    if (clickDestPos) {
+        const updatedPenguin = { ...penguin, clickDestPos: clickDestPos, clickOriginPos: penguin.currentPos }
+        setPenguinData(penguinId, updatedPenguin)
+    }
+    if (arrowKeyPressed) {
+        const updatedPenguin = { ...penguin, arrowKeyPressed: arrowKeyPressed }
+        setPenguinData(penguinId, updatedPenguin)
+    }
+
+    if (clickDestPos) {
+        const response = moveStepClickedPenguin(penguinId)
         if (response) return response
         return null
     }
-    else if (props.arrowKeyPressed) {
+    else if (arrowKeyPressed) {
         const response = handleArrowKeyMovement()
         // if (response) return response
         // return null
@@ -54,11 +64,12 @@ export const movementHandler = (props: MovementHandlerProps) => {
     }
 }
 
-const handleClickMovement = async (props: MovementHandlerProps) => {
-    const { penguinId, clickDestPos } = props
+const moveStepClickedPenguin = async (penguinId: string) => {
     const penguin = await getPenguinData(penguinId)
+
     if (!penguin) return null
-    const { currentPos } = penguin
+    const { currentPos, clickDestPos } = penguin
+
 
     if (clickDestPos) {
         const [currX, currY] = currentPos;
@@ -68,12 +79,15 @@ const handleClickMovement = async (props: MovementHandlerProps) => {
 
         // TODO: set the orientation of the penguin through the comparison of 
         // current and destination positions
-
-        const newPenguin: Penguin = { ...penguin, currentPos: [newX, newY] }
-        const response = await setPenguinData(penguinId, newPenguin)
+        const updatedPenguin: Penguin = { ...penguin, currentPos: [newX, newY] }
+        if (newX === destX && newY === destY) {
+            updatedPenguin.clickDestPos = null;
+            updatedPenguin.clickOriginPos = null;
+        }
+        const response = await setPenguinData(penguinId, updatedPenguin)
         console.log(response)
 
-        //TODO: publish changes
+        //TODO: publish changes?
 
         return response
     }
@@ -103,24 +117,26 @@ const handleArrowKeyMovement = () => {
 }
 
 const testPenguin: Penguin = {
-    id: 'bruno',
+    id: 'brodie',
     email: 'test@test.com',
     name: 'test',
     color: 'red',
     currentPos: [0, 0],
+    clickDestPos: null,
+    clickOriginPos: null,
+    arrowKeyPressed: null
 }
 
 console.log('initial penguin:', testPenguin)
-await setPenguinData('bruno', testPenguin)
+await setPenguinData('brodie', testPenguin)
 debugger;
 
-console.log(await movementHandler({ penguinId: "bruno", clickDestPos: [3, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
-console.log('new penguin after click:', await getPenguinData('bruno'))
-debugger;
-console.log(await movementHandler({ penguinId: "bruno", clickDestPos: [3, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
-console.log('new penguin after click:', await getPenguinData('bruno'))
-console.log(await movementHandler({ penguinId: "bruno", clickDestPos: [3, 1], clickOriginPos: [0, 0], arrowKeyPressed: null }))
-console.log('new penguin after click:', await getPenguinData('bruno'))
+console.log(await movementHandler({ penguinId: "brodie", clickDestPos: [3, 1], arrowKeyPressed: null }))
+console.log('new penguin after step 1:', await getPenguinData('brodie'))
+console.log(await movementHandler({ penguinId: "brodie", clickDestPos: [3, 1], arrowKeyPressed: null }))
+console.log('new penguin after step 2:', await getPenguinData('brodie'))
+console.log(await movementHandler({ penguinId: "brodie", clickDestPos: [3, 1], arrowKeyPressed: null }))
+console.log('new penguin after step 3:', await getPenguinData('brodie'))
 
 
 // don't use await
