@@ -91,6 +91,7 @@ export const updatePosition = async (req: Request, res: Response) => {
         const penguinId = 'brodie'
         const { position }: { position: Position } = req.body;
 
+
         if (!penguinId || !position || typeof position.x !== 'number' || typeof position.y !== 'number') {
             return res.status(400).json({ error: 'Invalid input' });
         }
@@ -114,14 +115,15 @@ export const getPosition = async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
         const penguin = await getPenguinData(userId)
-        const position = penguin?.currentPos
+        if (!penguin) return res.status(404).json({ error: 'Penguin not found' });
+        const position = penguin.currentPos
 
         if (!position) {
             return res.status(404).json({ error: 'Position not found' });
         }
 
 
-        res.status(200).json({
+        return res.status(200).json({
             x: position[0],
             y: position[1]
         })
