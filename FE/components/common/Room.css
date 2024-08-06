@@ -1,5 +1,18 @@
 .canvas {
-width: 1000px;
-height: 1000px;
-background-color: black;
+    max-width: 1000px; /* Set max-width to 2000px */
+    max-height: 1000px; /* Set max-height to 2000px */
+    width: 100%; /* Make sure the canvas takes full available width */
+    height: 100%; /* Make sure the canvas takes full available height */
+    
+    background-image: url('../../src/assets/Follower_of_Jheronimus_Bosch_Christ_in_Limbo.jpg'); /* Path to your image */
+    background-size: cover; /* Ensure the background image covers the entire element */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Prevent background image from repeating */
+    position: relative; /* Ensure the title and NavBar can be positioned inside this container */
+
+    /* background-color: aliceblue; */
+
 }
+.character-marker {
+    transition: all 0.2s ease-in-out; /* Smooth transition for size and color */
+  }

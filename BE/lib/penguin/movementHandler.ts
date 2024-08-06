@@ -1,5 +1,5 @@
 // this function takes in a penguin object
-// and the new position that's been proprosed
+// and the new Position that's been proprosed
 // it actually checks if what was sent was a 
 // and returns 
 
@@ -8,7 +8,7 @@ import redis from "../utils/redisClient";
 import { getPenguinData, setPenguinData } from "../utils/redisOps";
 
 
-type MovementHandlerProps = {
+export type MovementHandlerProps = {
     penguinId: string;
     clickDestPos: [number, number] | null,
     arrowKeyPressed: string | null

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:9000';
 
-interface Point {
+interface Position {
     x: number;
     y: number;
 }
@@ -21,7 +21,7 @@ export const initializePlayer = async () => {
 };
 
 // Function to fetch room data
-export const getRoomData = async (): Promise<Point[]> => {
+export const getRoomData = async (): Promise<Position[]> => {
     try {
         const response = await axios.get(`${API_URL}/get-room-data`);
         return response.data;
@@ -40,7 +40,7 @@ export const updatePosition = async (penguinId: string, position: { x: number, y
         });
         return response.data;
     } catch (error) {
-        console.error('Error updating position:', error);
+        console.error('Error updating Position:', error);
         throw error;
     }
 };
@@ -53,7 +53,7 @@ export const getPosition = async (penguinId: string) => {
         console.log('got response', response)
         return response.data;
     } catch (error) {
-        console.error('Error getting position:', error);
+        console.error('Error getting Position:', error);
         throw error;
     }
 };

@@ -1,4 +1,6 @@
 import type { Request, Response } from 'express';
+
+
 import { getPenguinData, setPenguinData } from '../lib/utils/redisOps';
 import { Penguin } from '../lib/penguin/types';
 import { randomUUID } from 'crypto';
@@ -6,24 +8,24 @@ import { generateRandomColor } from '../lib/utils/generateRandomColor';
 import { movementInputHandler } from '../lib/penguin/movementHandler';
 import redis from '../lib/utils/redisClient';
 
+type MovementHandlerProps = {
+    penguinId: string;
+    clickDestPos: [number, number] | null;
+    clickOriginPos: [number, number] | null;
+    arrowKeyPressed: string | null;
+}
 
 interface Position {
     x: number;
     y: number;
 }
 
-interface Point {
-    x: number;
-    y: number;
-}
-
-
 interface GameState {
     roomName: string;
-    coordinates: Point[];
+    coordinates: Position[];
     status: 'ongoing' | 'paused' | 'ended'; // You can expand this as needed
     players: string[];
-    playerInitialPosition: Point;
+    playerInitialPosition: Position;
 }
 
 
@@ -33,8 +35,8 @@ const penguinId: string = 'string'
 
 
 // Generating room
-export const generateRoom = (width: number, height: number): Point[] => {
-    const room: Point[] = [];
+export const generateRoom = (width: number, height: number): Position[] => {
+    const room: Position[] = [];
 
     for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {
@@ -49,6 +51,7 @@ export const generateRoom = (width: number, height: number): Point[] => {
 export const initializePlayer = async (req: Request, res: Response) => {
     // for the future: do penguinId
 
+    //connect with redis client for real
     try {
         const initialPosition: Position = { x: 618, y: 618 };
         const newId = randomUUID(); // Generate a new UUID for the penguin
@@ -86,11 +89,7 @@ export const storeInitialGameState = async () => {
 
 export const updatePosition = async (req: Request, res: Response) => {
     try {
-        // const { penguinId, position }: { penguinId: string, position: Position } = req.body;
-
-        const penguinId = 'brodie'
-        const { position }: { position: Position } = req.body;
-
+        const { penguinId, position }: { penguinId: string, position: Position } = req.body;
 
         if (!penguinId || !position || typeof position.x !== 'number' || typeof position.y !== 'number') {
             return res.status(400).json({ error: 'Invalid input' });
@@ -101,16 +100,21 @@ export const updatePosition = async (req: Request, res: Response) => {
         const x = position.x;
         const y = position.y;
 
-        movementInputHandler({ penguinId: penguinId, clickDestPos: [x, y], arrowKeyPressed: null })
+        const result = await movementInputHandler({ penguinId: penguinId, clickDestPos: [x, y], arrowKeyPressed: null })
 
-        res.status(200).json({ message: 'Position updated successfully' });
+        if (!null) {
+            res.status(200).json({ message: 'Position updated successfully' });
+        } else {
+            res.status(400).json({ error: 'Unable to update Position' });
+        }
+
     } catch (error) {
-        console.error('Error updating position:', error);
+        console.error('Error updating Position:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
-//Function to get the position
+//Function to get the Position
 export const getPosition = async (req: Request, res: Response) => {
     try {
         const { penguinId } = req.params;
@@ -129,12 +133,13 @@ export const getPosition = async (req: Request, res: Response) => {
         })
     }
     catch (error) {
-        console.error('Error getting position:', error);
+        console.error('Error getting Position:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 }
 
-export const getRoomData = async (): Promise<Point[]> => {
+
+export const getRoomData = async (): Promise<Position[]> => {
     try {
 
         //Since Room0 is the beta one, this will be hardcoded
