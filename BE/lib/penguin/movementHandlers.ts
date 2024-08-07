@@ -18,7 +18,7 @@ export type MovementHandlerProps = {
 // then process it as a clik
 
 
-export const movementInputHandler = async ({ penguinId, clickDestPos, arrowKeyPressed }: MovementHandlerProps) => {
+export const parseInputMovement = async ({ penguinId, clickDestPos, arrowKeyPressed }: MovementHandlerProps) => {
 
     const penguin = await getPenguinData(penguinId)
     if (!penguin) return null
@@ -36,24 +36,7 @@ export const movementInputHandler = async ({ penguinId, clickDestPos, arrowKeyPr
 
 
 // will this cause a problem if async 
-export const doMovementStep = async ({ penguinId }: { penguinId: string }) => {
-
-    // movement handler 
-    // give me all the penguins that have a difference between their current position 
-    // checkPenguinDiff(allPenguins)
-    // if a penguin has a difference, move them once towards it. movementHandler() is one handler and one step
-
-    // refactor Penguin so that it also holds the destination and origin
-    // clickHandler sets the destination of the penguin.
-    // the game loop runs checkPenguinDiff() which does a filter on array of all penguins
-    // (create a redisOp to retrieve list of all penguins)
-    // map over diffedPenguins and run movementHandler() so that all penguins are moved one step 
-    // closer to their destination (we can use movementHandler off the shelf here)
-    // 
-    // at this point we might not even need to publish the changes? it's possible
-    // because the frontend can just pull the list 
-    // once the destination has been reached, set the destination to null again
-    // 
+export const movementStepHandler = async ({ penguinId }: { penguinId: string }) => {
 
     const penguin = await getPenguinData(penguinId)
     if (!penguin) return null
@@ -61,19 +44,27 @@ export const doMovementStep = async ({ penguinId }: { penguinId: string }) => {
     const { clickDestPos, arrowKeyPressed } = penguin
 
     if (clickDestPos) {
-        const response = doClickMovementStep(penguinId)
-        if (response) return response
-        return null
+        const updatedPenguin = await calculateNextPositionStep(penguinId)
+        if (!updatedPenguin) return null
+        const response = await setPenguinData(penguinId, updatedPenguin)
+        console.log("logging new position:", await getPenguinData(penguinId))
+
+        //TODO: publish changes?
+
+        return response
+
+
     }
     else if (arrowKeyPressed) {
         const response = handleArrowKeyMovement()
         // if (response) return response
         // return null
-
     }
+
+
 }
 
-const doClickMovementStep = async (penguinId: string) => {
+const calculateNextPositionStep = async (penguinId: string): Promise<Penguin | null> => {
     const penguin = await getPenguinData(penguinId)
 
     if (!penguin) return null
@@ -93,12 +84,9 @@ const doClickMovementStep = async (penguinId: string) => {
             updatedPenguin.clickDestPos = null;
             updatedPenguin.clickOriginPos = null;
         }
-        const response = await setPenguinData(penguinId, updatedPenguin)
-        console.log("logging new position:", await getPenguinData(penguinId))
 
-        //TODO: publish changes?
+        return updatedPenguin
 
-        return response
     }
     else {
         return null
