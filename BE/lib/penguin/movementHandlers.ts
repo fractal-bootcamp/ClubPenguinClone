@@ -7,7 +7,7 @@ import { Entity, Penguin } from "../types";
 import { getEntityMap } from "../utils/getRoomAndEntityMap";
 import redis from "../utils/redisClient";
 import { getPenguinData, setPenguinData } from "../utils/redisOps";
-import { collisionCheck } from "./collisionHandlers";
+import { processCollision } from "./collisionHandlers";
 
 
 
@@ -49,7 +49,7 @@ export const movementStepHandler = async ({ penguinId }: { penguinId: string }) 
         const proposedMovePenguin = await calculateNextPositionStep(penguinId)
         if (!proposedMovePenguin) return null
 
-        const checkedPenguin = collisionCheck({ proposedMovePenguin: proposedMovePenguin, prevPenguin: penguin })
+        const checkedPenguin = processCollision({ proposedMovePenguin: proposedMovePenguin, prevPenguin: penguin })
 
         const response = await setPenguinData(penguinId, checkedPenguin)
         console.log("logging new position:", await getPenguinData(penguinId))
