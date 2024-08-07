@@ -10,3 +10,17 @@ export type Penguin = {
     clickOriginPos: [number, number] | null
     arrowKeyPressed: string | null
 }
+
+export type Entity = {
+    name: string,
+    blocking: boolean,
+    onCollisionActions: (() => void)[],
+}
+
+export type EntityMapCell = {
+    x: number,
+    y: number,
+    entities: Entity[]
+}
+
+export type EntityMap = EntityMapCell[] 
