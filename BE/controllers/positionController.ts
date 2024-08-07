@@ -5,7 +5,7 @@ import { getPenguinData, setPenguinData } from '../lib/utils/redisOps';
 import { Penguin } from '../lib/penguin/types';
 import { randomUUID } from 'crypto';
 import { generateRandomColor } from '../lib/utils/generateRandomColor';
-import { movementInputHandler } from '../lib/penguin/movementHandler';
+import { parseInputMovement } from '../lib/penguin/movementHandler';
 import redis from '../lib/utils/redisClient';
 
 type MovementHandlerProps = {
@@ -100,12 +100,12 @@ export const updatePosition = async (req: Request, res: Response) => {
         const x = position.x;
         const y = position.y;
 
-        const result = await movementInputHandler({ penguinId: penguinId, clickDestPos: [x, y], arrowKeyPressed: null })
+        const result = await parseInputMovement({ penguinId: penguinId, clickDestPos: [x, y], arrowKeyPressed: null })
 
-        if (!null) {
-            res.status(200).json({ message: 'Position updated successfully' });
-        } else {
+        if (result === null) {
             res.status(400).json({ error: 'Unable to update Position' });
+        } else {
+            res.status(200).json({ message: 'Position updated successfully' });
         }
 
     } catch (error) {

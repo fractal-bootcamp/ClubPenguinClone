@@ -18,7 +18,7 @@ export type MovementHandlerProps = {
 // then process it as a clik
 
 
-export const movementInputHandler = async ({ penguinId, clickDestPos, arrowKeyPressed }: MovementHandlerProps) => {
+export const parseInputMovement = async ({ penguinId, clickDestPos, arrowKeyPressed }: MovementHandlerProps) => {
 
     const penguin = await getPenguinData(penguinId)
     if (!penguin) return null
