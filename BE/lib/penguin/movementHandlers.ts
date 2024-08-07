@@ -3,7 +3,8 @@
 // it actually checks if what was sent was a 
 // and returns 
 
-import { Penguin } from "../types";
+import { Entity, Penguin } from "../types";
+import { getEntityMap } from "../utils/getRoomAndEntityMap";
 import redis from "../utils/redisClient";
 import { getPenguinData, setPenguinData } from "../utils/redisOps";
 
@@ -44,8 +45,10 @@ export const movementStepHandler = async ({ penguinId }: { penguinId: string }) 
     const { clickDestPos, arrowKeyPressed } = penguin
 
     if (clickDestPos) {
-        const updatedPenguin = await calculateNextPositionStep(penguinId)
-        if (!updatedPenguin) return null
+        const proposedMovePenguin = await calculateNextPositionStep(penguinId)
+        if (!proposedMovePenguin) return null
+
+        const checkedPenguin = collisionCheck({ proposedMovePenguin: proposedMovePenguin, prevPenguin: penguin })
 
         const response = await setPenguinData(penguinId, updatedPenguin)
         console.log("logging new position:", await getPenguinData(penguinId))
@@ -64,6 +67,40 @@ export const movementStepHandler = async ({ penguinId }: { penguinId: string }) 
 
 
 }
+
+const collisionCheck = ({ proposedMovePenguin, prevPenguin }: { proposedMovePenguin: Penguin, prevPenguin: Penguin }) => {
+    const { currentPos, clickDestPos } = proposedMovePenguin
+    const { currentRoom } = proposedMovePenguin
+    const entityMap = getEntityMap(currentRoom)
+
+    const checkedCell = entityMap.find((cell) => cell.x === currentPos[0] && cell.y === currentPos[1])
+    if (checkedCell) {
+        if (checkedCell.entities) {
+            processEntityCollisions
+                ({ proposedMovePenguin: proposedMovePenguin, entities: checkedCell.entities, prevPenguin: prevPenguin })
+        }
+    }
+
+
+
+
+}
+
+const processEntityCollisions = ({ proposedMovePenguin, entities, prevPenguin }: { proposedMovePenguin: Penguin, entities: Entity[], prevPenguin: Penguin }): Penguin => {
+    entities.forEach(entity => {
+        entity.onCollisionActions.forEach(action => action());
+    });
+
+    // Calculate collisions
+    const isBlocked = entities.some(entity =>
+        entity.blocking
+    );
+
+    return isBlocked
+        ? { ...proposedMovePenguin, currentPos: prevPenguin.currentPos }
+        : proposedMovePenguin;
+}
+
 
 const calculateNextPositionStep = async (penguinId: string): Promise<Penguin | null> => {
     const penguin = await getPenguinData(penguinId)
