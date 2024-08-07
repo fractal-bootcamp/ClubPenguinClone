@@ -5,7 +5,7 @@ import { getPenguinData, setPenguinData } from '../lib/utils/redisOps';
 import { Penguin } from '../lib/penguin/types';
 import { randomUUID } from 'crypto';
 import { generateRandomColor } from '../lib/utils/generateRandomColor';
-import { parseInputMovement } from '../lib/penguin/movementHandler';
+import { parseInputMovement } from '../lib/penguin/movementHandlers';
 import redis from '../lib/utils/redisClient';
 
 type MovementHandlerProps = {
