@@ -46,6 +46,7 @@ export const movementStepHandler = async ({ penguinId }: { penguinId: string }) 
     if (clickDestPos) {
         const updatedPenguin = await calculateNextPositionStep(penguinId)
         if (!updatedPenguin) return null
+
         const response = await setPenguinData(penguinId, updatedPenguin)
         console.log("logging new position:", await getPenguinData(penguinId))
 
