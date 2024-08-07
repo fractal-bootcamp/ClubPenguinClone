@@ -50,7 +50,7 @@ export const movementStepHandler = async ({ penguinId }: { penguinId: string }) 
 
         const checkedPenguin = collisionCheck({ proposedMovePenguin: proposedMovePenguin, prevPenguin: penguin })
 
-        const response = await setPenguinData(penguinId, updatedPenguin)
+        const response = await setPenguinData(penguinId, checkedPenguin)
         console.log("logging new position:", await getPenguinData(penguinId))
 
         //TODO: publish changes?
@@ -68,28 +68,29 @@ export const movementStepHandler = async ({ penguinId }: { penguinId: string }) 
 
 }
 
-const collisionCheck = ({ proposedMovePenguin, prevPenguin }: { proposedMovePenguin: Penguin, prevPenguin: Penguin }) => {
+const collisionCheck = ({ proposedMovePenguin, prevPenguin }: { proposedMovePenguin: Penguin, prevPenguin: Penguin }): Penguin => {
     const { currentPos, clickDestPos } = proposedMovePenguin
     const { currentRoom } = proposedMovePenguin
     const entityMap = getEntityMap(currentRoom)
 
     const checkedCell = entityMap.find((cell) => cell.x === currentPos[0] && cell.y === currentPos[1])
-    if (checkedCell) {
-        if (checkedCell.entities) {
-            processEntityCollisions
-                ({ proposedMovePenguin: proposedMovePenguin, entities: checkedCell.entities, prevPenguin: prevPenguin })
-        }
+    if (checkedCell && checkedCell.entities) {
+        processEntityCollisionActions({ entities: checkedCell.entities })
+        return calculateProposedOrPrevPenguin
+            ({ proposedMovePenguin: proposedMovePenguin, entities: checkedCell.entities, prevPenguin: prevPenguin })
     }
-
-
-
-
+    else {
+        return proposedMovePenguin
+    }
 }
 
-const processEntityCollisions = ({ proposedMovePenguin, entities, prevPenguin }: { proposedMovePenguin: Penguin, entities: Entity[], prevPenguin: Penguin }): Penguin => {
+const processEntityCollisionActions = ({ entities }: { entities: Entity[] }) => {
     entities.forEach(entity => {
         entity.onCollisionActions.forEach(action => action());
     });
+}
+
+const calculateProposedOrPrevPenguin = ({ proposedMovePenguin, entities, prevPenguin }: { proposedMovePenguin: Penguin, entities: Entity[], prevPenguin: Penguin }): Penguin => {
 
     // Calculate collisions
     const isBlocked = entities.some(entity =>
