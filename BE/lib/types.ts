@@ -12,6 +12,14 @@ export type Penguin = {
     currentRoom: string // room id
 }
 
+export type WallCorner = {
+    x: number,
+    y: number
+}
+
+export type Wall = WallCorner[]
+
+
 export type Entity = {
     name: string,
     blocking: boolean,

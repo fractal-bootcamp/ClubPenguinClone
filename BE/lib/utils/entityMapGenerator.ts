@@ -1,10 +1,5 @@
-import { EntityMapCell, Entity, EntityMap } from "../types";
+import { EntityMapCell, Entity, EntityMap, Wall } from "../types";
 
-type WallCorner = {
-    x: number,
-    y: number
-}
-type Wall = WallCorner[]
 
 const wall1: Wall = [
     { x: 102, y: 578 },
@@ -61,5 +56,17 @@ export const generateEntityMap = (walls: Wall[]): EntityMap => {
 
 }
 
-const entityMap = generateEntityMap([wall1, wall2, wall3]);
-console.log(entityMap.map(cell => cell.entities)); // Log entities inside of entityMap
+
+const dummyMapGenerator = () => {
+    const fs = require('fs');
+    const path = require('path');
+
+    const entityMap = generateEntityMap([wall1, wall2, wall3]);
+    const outputPath = path.join(__dirname, '../entityMapOutput.json');
+    fs.writeFileSync(outputPath, JSON.stringify(entityMap, null, 2), 'utf-8');
+    console.log(`Entity map written to ${outputPath}`);
+
+}
+
+dummyMapGenerator();
+

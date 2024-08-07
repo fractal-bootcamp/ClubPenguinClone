@@ -49,7 +49,9 @@ export const movementStepHandler = async ({ penguinId }: { penguinId: string }) 
         const proposedMovePenguin = await calculateNextPositionStep(penguinId)
         if (!proposedMovePenguin) return null
 
+        console.time('processCollision')
         const checkedPenguin = processCollision({ proposedMovePenguin: proposedMovePenguin, prevPenguin: penguin })
+        console.timeEnd('processCollision')
 
         const response = await setPenguinData(penguinId, checkedPenguin)
         console.log("logging new position:", await getPenguinData(penguinId))
@@ -86,7 +88,7 @@ const calculateNextPositionStep = async (penguinId: string): Promise<Penguin | n
 
         // TODO: set the orientation of the penguin through the comparison of 
         // current and destination positions
-        const updatedPenguin: Penguin = { ...penguin, currentPos: [newX, newY] }
+        const updatedPenguin: Penguin = { ...penguin, currentPos: [Math.round(newX), Math.round(newY)] }
         if (checkIfDestinationIsReached(currX, destX) && checkIfDestinationIsReached(currY, destY)) {
             updatedPenguin.clickDestPos = null;
             updatedPenguin.clickOriginPos = null;
