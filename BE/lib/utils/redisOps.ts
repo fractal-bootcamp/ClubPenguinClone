@@ -1,4 +1,4 @@
-import { Penguin } from "../penguin/types"
+import { Penguin } from "../types"
 import redis from "./redisClient"
 
 const PENGUIN_SET_KEY = 'penguins'

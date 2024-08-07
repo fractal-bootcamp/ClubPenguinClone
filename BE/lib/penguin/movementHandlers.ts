@@ -3,19 +3,10 @@
 // it actually checks if what was sent was a 
 // and returns 
 
-import { Penguin } from "./types";
+import { Penguin } from "../types";
 import redis from "../utils/redisClient";
 import { getPenguinData, setPenguinData } from "../utils/redisOps";
 
-
-export type MovementHandlerProps = {
-    penguinId: string;
-    clickDestPos: [number, number] | null,
-    arrowKeyPressed: string | null
-}
-
-// if the penguin movement is passed as a click
-// then process it as a clik
 
 
 export const parseInputMovement = async ({ penguinId, clickDestPos, arrowKeyPressed }: MovementHandlerProps) => {
@@ -33,6 +24,15 @@ export const parseInputMovement = async ({ penguinId, clickDestPos, arrowKeyPres
     }
 
 }
+
+
+
+export type MovementHandlerProps = {
+    penguinId: string;
+    clickDestPos: [number, number] | null,
+    arrowKeyPressed: string | null
+}
+
 
 
 // will this cause a problem if async 

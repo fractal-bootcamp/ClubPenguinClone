@@ -9,6 +9,7 @@ export type Penguin = {
     clickDestPos: [number, number] | null,
     clickOriginPos: [number, number] | null
     arrowKeyPressed: string | null
+    currentRoom: string // room id
 }
 
 export type Entity = {
