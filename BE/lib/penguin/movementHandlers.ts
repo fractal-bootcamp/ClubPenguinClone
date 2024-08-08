@@ -3,19 +3,12 @@
 // it actually checks if what was sent was a 
 // and returns 
 
-import { Penguin } from "./types";
+import { Entity, Penguin } from "../types";
+import { getEntityMap } from "../utils/getRoomAndEntityMap";
 import redis from "../utils/redisClient";
 import { getPenguinData, setPenguinData } from "../utils/redisOps";
+import { processCollision } from "./collisionHandlers";
 
-
-export type MovementHandlerProps = {
-    penguinId: string;
-    clickDestPos: [number, number] | null,
-    arrowKeyPressed: string | null
-}
-
-// if the penguin movement is passed as a click
-// then process it as a clik
 
 
 export const parseInputMovement = async ({ penguinId, clickDestPos, arrowKeyPressed }: MovementHandlerProps) => {
@@ -35,6 +28,15 @@ export const parseInputMovement = async ({ penguinId, clickDestPos, arrowKeyPres
 }
 
 
+
+export type MovementHandlerProps = {
+    penguinId: string;
+    clickDestPos: [number, number] | null,
+    arrowKeyPressed: string | null
+}
+
+
+
 // will this cause a problem if async 
 export const movementStepHandler = async ({ penguinId }: { penguinId: string }) => {
 
@@ -44,10 +46,14 @@ export const movementStepHandler = async ({ penguinId }: { penguinId: string }) 
     const { clickDestPos, arrowKeyPressed } = penguin
 
     if (clickDestPos) {
-        const updatedPenguin = await calculateNextPositionStep(penguinId)
-        if (!updatedPenguin) return null
+        const proposedMovePenguin = await calculateNextPositionStep(penguinId)
+        if (!proposedMovePenguin) return null
 
-        const response = await setPenguinData(penguinId, updatedPenguin)
+        console.time('processCollision')
+        const checkedPenguin = processCollision({ proposedMovePenguin: proposedMovePenguin, prevPenguin: penguin })
+        console.timeEnd('processCollision')
+
+        const response = await setPenguinData(penguinId, checkedPenguin)
         console.log("logging new position:", await getPenguinData(penguinId))
 
         //TODO: publish changes?
@@ -65,6 +71,8 @@ export const movementStepHandler = async ({ penguinId }: { penguinId: string }) 
 
 }
 
+
+
 const calculateNextPositionStep = async (penguinId: string): Promise<Penguin | null> => {
     const penguin = await getPenguinData(penguinId)
 
@@ -80,7 +88,7 @@ const calculateNextPositionStep = async (penguinId: string): Promise<Penguin | n
 
         // TODO: set the orientation of the penguin through the comparison of 
         // current and destination positions
-        const updatedPenguin: Penguin = { ...penguin, currentPos: [newX, newY] }
+        const updatedPenguin: Penguin = { ...penguin, currentPos: [Math.round(newX), Math.round(newY)] }
         if (checkIfDestinationIsReached(currX, destX) && checkIfDestinationIsReached(currY, destY)) {
             updatedPenguin.clickDestPos = null;
             updatedPenguin.clickOriginPos = null;
