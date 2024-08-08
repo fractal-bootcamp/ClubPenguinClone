@@ -10,7 +10,7 @@ const router = express.Router();
 
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:5177', // Allow requests from this origin
+    origin: 'http://localhost:5174', // Allow requests from this origin
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific methods
     allowedHeaders: ['Content-Type', 'Authorization'] // Allow specific headers
 }));
@@ -57,4 +57,4 @@ gameWorker = setInterval(function () {
     console.log("Game state:", gameState);
     incrementGameState()
     moveAllMovingPenguins()
-}, 100);
+}, 500);

@@ -4,7 +4,7 @@
     width: 100%; /* Make sure the canvas takes full available width */
     height: 100%; /* Make sure the canvas takes full available height */
     
-    background-image: url('../../src/assets/Follower_of_Jheronimus_Bosch_Christ_in_Limbo.jpg'); /* Path to your image */
+    /* background-image: url('../../src/assets/Follower_of_Jheronimus_Bosch_Christ_in_Limbo.jpg'); Path to your image */
     background-size: cover; /* Ensure the background image covers the entire element */
     background-position: center; /* Center the background image */
     background-repeat: no-repeat; /* Prevent background image from repeating */
