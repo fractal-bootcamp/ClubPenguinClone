@@ -29,8 +29,8 @@ const WallEntity: Entity = {
 
 
 export const generateEntityMap = (walls: Wall[]): EntityMap => {
-    const initialMap = Array.from({ length: 2000 }, (_, y) =>
-        Array.from({ length: 2000 }, (_, x) => ({ x, y, entities: [] }))
+    const initialMap = Array.from({ length: 100 }, (_, y) =>
+        Array.from({ length: 100 }, (_, x) => ({ x, y, entities: [] }))
     ).flat();
 
 
@@ -53,7 +53,6 @@ export const generateEntityMap = (walls: Wall[]): EntityMap => {
         return cell;
     })
     return newMap;
-
 }
 
 
