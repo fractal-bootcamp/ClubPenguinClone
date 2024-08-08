@@ -1,6 +1,8 @@
 import { Entity, Penguin } from "../types"
 import { getEntityMap } from "../utils/getRoomAndEntityMap"
 
+export const CHUNK_SIZE = 10;
+
 export const processCollision = ({ proposedMovePenguin, prevPenguin }: { proposedMovePenguin: Penguin, prevPenguin: Penguin }): Penguin => {
     const { currentPos, clickDestPos } = proposedMovePenguin
     const { currentRoom } = proposedMovePenguin
@@ -10,21 +12,17 @@ export const processCollision = ({ proposedMovePenguin, prevPenguin }: { propose
 
     console.time('findCell')
 
-    const entityMapWidth = entityMap[entityMap.length - 1].x
-    const entityMapHeight = entityMap[entityMap.length - 1].y
-    //get the index in the entity map 
-    const entityMapIndex = currentPos[0] + entityMapWidth * currentPos[1]
-    const checkedCell = entityMap[entityMapIndex]
-    const chunkX = Math.floor(currentPos[0] / chunkSize)
-    const chunkY = Math.floor(currentPos[1] / chunkSize)
-    const checkedChunk = chunks.find((chunk) => chunk.x === chunkX && chunk.y === chunkY)
+    const chunkX = Math.floor(currentPos[0] / CHUNK_SIZE)
+    const chunkY = Math.floor(currentPos[1] / CHUNK_SIZE)
+    const checkedChunk = entityMap.find((chunk) => chunk.x === chunkX && chunk.y === chunkY)
+
     console.timeEnd('findCell')
-    if (checkedCell && checkedCell.entities) {
+    if (checkedChunk && checkedChunk.entities) {
         console.time('runEntityCollisionActions')
-        runEntityCollisionActions({ entities: checkedCell.entities })
+        runEntityCollisionActions({ entities: checkedChunk.entities })
         console.timeEnd('runEntityCollisionActions')
         return calculateProposedOrPrevPenguin
-            ({ proposedMovePenguin: proposedMovePenguin, entities: checkedCell.entities, prevPenguin: prevPenguin })
+            ({ proposedMovePenguin: proposedMovePenguin, entities: checkedChunk.entities, prevPenguin: prevPenguin })
     }
     else {
         return proposedMovePenguin

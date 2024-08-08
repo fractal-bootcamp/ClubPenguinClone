@@ -20,6 +20,27 @@ router.post('/update-position', updatePosition);
 router.get('/get-position/:penguinId', getPosition);
 router.get('/get-room-data', getRoomData)
 
+app.post('/create-entity-map', (req, res) => {
+    const entityMap = req.body;
+
+    if (!entityMap) {
+        return res.status(400).json({ error: 'Entity map is required' });
+    }
+
+    const fs = require('fs');
+    const path = require('path');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-'); // Format timestamp
+    const outputPath = path.join(__dirname, `../entityMap_${timestamp}.json`);
+
+    fs.writeFileSync(outputPath, JSON.stringify(entityMap, null, 2), 'utf-8');
+    console.log(`Entity map written to ${outputPath}`);
+
+    res.status(200).json({ message: 'Entity map saved successfully', path: outputPath });
+});
+
+
+
+
 
 //Initialize the game state when the server starts
 storeInitialGameState();

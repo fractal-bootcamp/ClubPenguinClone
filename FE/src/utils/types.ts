@@ -19,13 +19,16 @@ export type WallCorner = {
 
 export type Wall = WallCorner[]
 
-
-export type EntityCategory = 'wall' | 'penguin' | 'coin' | 'door'
-
 export type Entity = {
-    name: EntityCategory,
+    name: string,
     blocking: boolean,
     onCollisionActions: (() => void)[],
+}
+
+export const Wall: Entity = {
+    name: 'wall',
+    blocking: true,
+    onCollisionActions: []
 }
 
 export type EntityMapCell = {
@@ -34,4 +37,4 @@ export type EntityMapCell = {
     entities: Entity[]
 }
 
-export type EntityMap = EntityMapCell[] 
+export type EntityMap = EntityMapCell[]
