@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Entity, EntityMap, Wall } from "./utils/types";
-import { saveMapToFile } from "./utils/saveMapToFile";
 import { sendMapToServer } from "./utils/sendMapToServer";
 
 
@@ -92,7 +91,6 @@ const MapCreator = () => {
     const handleSaveMap = () => {
         const newMap = calculateNewEntityMap(collisionMap, entityMap, Wall);
         setEntityMap(newMap);
-        saveMapToFile(newMap);
         sendMapToServer(newMap)
     }
 
