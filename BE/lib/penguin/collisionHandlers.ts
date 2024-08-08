@@ -1,4 +1,4 @@
-import { Entity, Penguin } from "../types"
+import type { Entity, Penguin } from "../types"
 import { getEntityMap } from "../utils/getRoomAndEntityMap"
 
 export const CHUNK_SIZE = 10;

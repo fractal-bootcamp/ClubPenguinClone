@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Entity, EntityMap, Wall } from "./utils/types";
 import { sendMapToServer } from "./utils/sendMapToServer";
 
@@ -31,8 +31,7 @@ const calculateNewEntityMap = (collisionMap: boolean[], prevEntityMap: EntityMap
 
 
 const initialEntityMap: EntityMap = Array.from({ length: cellsX * cellsY }, (_, index) => {
-    const x = index % cellsX;
-    const y = Math.floor(index / cellsX);
+
     return {
         x: index % cellsX,
         y: Math.floor(index / cellsX),

@@ -7,12 +7,10 @@ interface Position {
 
 interface CharacterMarkerProps {
   position: Position;
-  onClick: (position: Position) => void; // Callback to handle click
 }
 
 const CharacterMarker: React.FC<CharacterMarkerProps> = ({
   position,
-  onClick,
 }) => {
   const [isClicked, setIsClicked] = useState(false);
 
@@ -20,7 +18,6 @@ const CharacterMarker: React.FC<CharacterMarkerProps> = ({
   const handleClick = () => {
     console.log("Marker clicked!");
     setIsClicked(true);
-    onClick(position); // Call parent click handler
     setTimeout(() => setIsClicked(false), 80); // Reset the animation state
   };
 

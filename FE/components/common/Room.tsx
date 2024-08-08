@@ -26,10 +26,7 @@ const Room = () => {
 
   //Handling movement
   const [position, setPosition] = useState<Position>({ x: 528, y: 630 });
-  const [newPosition, setNewPosition] = useState<Position | null>(null);
-  const [lastValidPosition, setLastValidPosition] = useState<Position | null>(
-    null
-  );
+
   const [canMove, setCanMove] = useState<boolean>(false); // New state to track if user can move
   const [isMoving, setIsMoving] = useState<boolean>(false);
 
@@ -108,27 +105,13 @@ const Room = () => {
     }
   };
 
-  const handleMarkerClick = async (markerPosition: Position) => {
-    // if (clickIsAvatarArea(markerPosition, position, 50)) {
-    //   // User clicked within X px of the current Position
-    //   setCanMove(true);
-    //   setIsMoving(false);
-    //   console.log("Marker selected. You can now move.");
-    // } else if (canMove && !isMoving) {
-    //   setIsMoving(true);
-    //   setNewPosition(markerPosition);
-    //   moveTowardsDestination(markerPosition);
-    // } else if (!canMove) {
-    //   console.log("You must click the marker first!");
-    // }
-  };
 
   return (
     <>
       <div
         className="canvas"
         onClick={handleCanvasClick}
-        style={{ width: "2000px", height: "2000px", position: "relative" }}
+        style={{ width: "1920px", height: "1080px", position: "relative" }}
       >
         {position && (
           <>
@@ -140,24 +123,10 @@ const Room = () => {
               body={body}
               head={head}
               weapon={weaponSprite}
-              onMarkerClick={handleMarkerClick}
             />
           </>
         )}
-        {/* {position && (
-          <div
-            className="Position-marker"
-            style={{
-              position: "absolute",
-              left: `${position.x}px`,
-              top: `${position.y}px`,
-              width: "10px",
-              height: "10px",
-              backgroundColor: "red",
-              borderRadius: "50%",
-            }}
-          />
-        )} */}
+
       </div>
       {position && (
         <p>

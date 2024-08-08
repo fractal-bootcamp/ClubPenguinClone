@@ -9,7 +9,6 @@ interface CharacterProps {
   body: string;
   head: string;
   weapon: string;
-  onMarkerClick: (position: Position) => void; // Add prop for click handler
 }
 
 interface Position {
@@ -25,8 +24,6 @@ const Character: React.FC<CharacterProps> = ({
   body,
   head,
   weapon,
-
-  onMarkerClick,
 }) => {
   const spriteSize = 128;
 
@@ -79,7 +76,7 @@ const Character: React.FC<CharacterProps> = ({
           }}
         />
       </div>
-      <CharacterMarker position={position} onClick={onMarkerClick} />
+      <CharacterMarker position={position} />
     </>
   );
 };

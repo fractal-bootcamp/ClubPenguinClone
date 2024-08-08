@@ -1,4 +1,3 @@
-import pako from 'pako';
 
 export const sendMapToServer = async (entityMap: any) => {
 
