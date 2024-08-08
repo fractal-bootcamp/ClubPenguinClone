@@ -13,7 +13,7 @@ export const getEntityMap = (currentRoom: string): EntityMap => {
     // const entityMap: EntityMap = mapsData[currentRoom] || [];
 
 
-    const dummyMap: EntityMap = mapsData || [];
+    const dummyMap = JSON.parse(fs.readFileSync(path.join(__dirname, './testMap.json'), 'utf-8'));
 
     return dummyMap;
 
