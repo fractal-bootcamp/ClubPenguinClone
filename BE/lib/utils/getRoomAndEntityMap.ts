@@ -1,18 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { EntityMap, Wall } from '../types';
-import { generateEntityMap } from './entityMapGenerator';
 
-const mapsPath = path.join(__dirname, '../entityMapOutput.json');
-const mapsData = JSON.parse(fs.readFileSync(mapsPath, 'utf-8'));
 
 export const getEntityMap = (currentRoom: string): EntityMap => {
-
-    // const mapsPath = path.join(__dirname, '../entityMaps.json');
-    // const mapsData = JSON.parse(fs.readFileSync(mapsPath, 'utf-8'));
-    // const entityMap: EntityMap = mapsData[currentRoom] || [];
-
-
     const dummyMap = JSON.parse(fs.readFileSync(path.join(__dirname, './testMap.json'), 'utf-8'));
 
     return dummyMap;
