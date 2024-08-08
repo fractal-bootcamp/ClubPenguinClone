@@ -10,8 +10,8 @@ function App() {
     <>
       <div>
         {/* <Main /> */}
-        {/* <Room /> */}
-        <MapCreator />
+        <Room />
+        {/* <MapCreator /> */}
       </div>
     </>
   );
