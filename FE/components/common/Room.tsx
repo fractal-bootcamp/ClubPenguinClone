@@ -26,10 +26,7 @@ const Room = () => {
 
   //Handling movement
   const [position, setPosition] = useState<Position>({ x: 528, y: 630 });
-  const [newPosition, setNewPosition] = useState<Position | null>(null);
-  const [lastValidPosition, setLastValidPosition] = useState<Position | null>(
-    null
-  );
+
   const [canMove, setCanMove] = useState<boolean>(false); // New state to track if user can move
   const [isMoving, setIsMoving] = useState<boolean>(false);
 
