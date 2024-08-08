@@ -105,20 +105,6 @@ const Room = () => {
     }
   };
 
-  const handleMarkerClick = async (markerPosition: Position) => {
-    // if (clickIsAvatarArea(markerPosition, position, 50)) {
-    //   // User clicked within X px of the current Position
-    //   setCanMove(true);
-    //   setIsMoving(false);
-    //   console.log("Marker selected. You can now move.");
-    // } else if (canMove && !isMoving) {
-    //   setIsMoving(true);
-    //   setNewPosition(markerPosition);
-    //   moveTowardsDestination(markerPosition);
-    // } else if (!canMove) {
-    //   console.log("You must click the marker first!");
-    // }
-  };
 
   return (
     <>
@@ -137,7 +123,6 @@ const Room = () => {
               body={body}
               head={head}
               weapon={weaponSprite}
-              onMarkerClick={handleMarkerClick}
             />
           </>
         )}
