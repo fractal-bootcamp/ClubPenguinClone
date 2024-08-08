@@ -9,7 +9,15 @@ export const processCollision = ({ proposedMovePenguin, prevPenguin }: { propose
     console.timeEnd('getEntityMap')
 
     console.time('findCell')
-    const checkedCell = entityMap.find((cell) => cell.x === currentPos[0] && cell.y === currentPos[1])
+
+    const entityMapWidth = entityMap[entityMap.length - 1].x
+    const entityMapHeight = entityMap[entityMap.length - 1].y
+    //get the index in the entity map 
+    const entityMapIndex = currentPos[0] + entityMapWidth * currentPos[1]
+    const checkedCell = entityMap[entityMapIndex]
+    const chunkX = Math.floor(currentPos[0] / chunkSize)
+    const chunkY = Math.floor(currentPos[1] / chunkSize)
+    const checkedChunk = chunks.find((chunk) => chunk.x === chunkX && chunk.y === chunkY)
     console.timeEnd('findCell')
     if (checkedCell && checkedCell.entities) {
         console.time('runEntityCollisionActions')

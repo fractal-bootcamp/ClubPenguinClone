@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
 
+type Chunk = {
+    x: number
+    y: number
+    entities: Entity[]
+}
 const mapsData = [
     {
         "x": 0,
