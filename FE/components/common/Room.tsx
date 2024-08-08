@@ -111,7 +111,7 @@ const Room = () => {
       <div
         className="canvas"
         onClick={handleCanvasClick}
-        style={{ width: "2000px", height: "2000px", position: "relative" }}
+        style={{ width: "1920px", height: "1080px", position: "relative" }}
       >
         {position && (
           <>
@@ -126,20 +126,7 @@ const Room = () => {
             />
           </>
         )}
-        {/* {position && (
-          <div
-            className="Position-marker"
-            style={{
-              position: "absolute",
-              left: `${position.x}px`,
-              top: `${position.y}px`,
-              width: "10px",
-              height: "10px",
-              backgroundColor: "red",
-              borderRadius: "50%",
-            }}
-          />
-        )} */}
+
       </div>
       {position && (
         <p>
