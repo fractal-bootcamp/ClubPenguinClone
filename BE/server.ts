@@ -2,10 +2,13 @@ import express from "express";
 import cors from "cors";
 import { updatePosition, getPosition, getRoomData, initializePlayer, storeInitialGameState } from './controllers/positionController'
 import { moveAllMovingPenguins } from "./lib/penguin/moveAllMovingPenguins";
-import pako from 'pako';
 import path from "path";
-import fs from "fs";
-import { pipeline } from "stream";
+import type { Request } from 'express';
+
+// Extend the Request interface
+interface RequestWithFile extends Request {
+    file?: Express.Multer.File; // Define the file property
+}
 
 const app = express();
 const port = 9000;
@@ -41,8 +44,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-app.post('/create-entity-map', upload.single('file'), async (req, res) => {
+app.post('/create-entity-map', upload.single('file'), async (req: RequestWithFile, res) => {
     console.log(req);
+
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
     const outputPath = path.join(__dirname, `../${req.file.filename}`);
 
     try {
@@ -53,7 +60,7 @@ app.post('/create-entity-map', upload.single('file'), async (req, res) => {
         res.status(200).json({ message: 'Entity map saved successfully', path: outputPath });
     } catch (error) {
         console.error('Error processing entity map:', error);
-        res.status(500).json({ error: 'Failed to process entity map', details: error.message });
+        res.status(500).json({ error: 'Failed to process entity map', details: error });
     }
 
 });
