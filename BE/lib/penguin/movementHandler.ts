@@ -24,7 +24,7 @@ export const movementInputHandler = async ({ penguinId, clickDestPos, arrowKeyPr
     if (!penguin) return null
 
     if (clickDestPos) {
-        const updatedPenguin = { ...penguin, clickDestPos: clickDestPos, clickOriginPos: penguin.currentPos, arrowKeyPressed: null }
+        const updatedPenguin = { ...penguin, clickDestPos: clickDestPos, clickOriginPos: penguin.currentPos, isMoving: true, arrowKeyPressed: null }
         setPenguinData(penguinId, updatedPenguin)
     }
     if (arrowKeyPressed) {
@@ -92,6 +92,7 @@ const doClickMovementStep = async (penguinId: string) => {
         if (checkIfDestinationIsReached(currX, destX) && checkIfDestinationIsReached(currY, destY)) {
             updatedPenguin.clickDestPos = null;
             updatedPenguin.clickOriginPos = null;
+            updatedPenguin.isMoving = false;
         }
         const response = await setPenguinData(penguinId, updatedPenguin)
         console.log("logging new position:", await getPenguinData(penguinId))
