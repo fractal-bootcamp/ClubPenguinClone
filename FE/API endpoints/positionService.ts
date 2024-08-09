@@ -36,7 +36,7 @@ export const updatePosition = async (penguinId: string, position: { x: number, y
     try {
         const response = await axios.post(`${API_URL}/update-position`, {
             penguinId,
-            position
+            position,
         });
         return response.data;
     } catch (error) {
