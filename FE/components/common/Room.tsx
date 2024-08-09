@@ -15,6 +15,8 @@ import bodySprite from "../../src/assets/isometric-hero/clothes.png";
 import headSprite from "../../src/assets/isometric-hero/male_head1.png";
 import weaponSprite from "../../src/assets/isometric-hero/shortsword.png";
 import { useInterval } from "../hooks/useInterval";
+import { fetchEntityMap } from "../utils/fetchEntityMap";
+import { EntityMap } from "../../src/utils/types";
 
 interface Position {
   x: number;
@@ -52,6 +54,11 @@ const Room = () => {
   const [isMovingFromBackend, setIsMovingFromBackend] =
     useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
+
+  const [entityMap, setEntityMap] = useState<EntityMap>([]);
+  const [debugMode, setDebugMode] = useState<boolean>(false);
+
+
 
   // Character's movement animation
   const [direction, setDirection] = useState<number>(0);
@@ -162,6 +169,7 @@ const Room = () => {
     const y = Math.floor(event.clientY - rect.top);
     const newClickedPos = { x, y };
 
+
     if (clickIsAvatarArea(newClickedPos, position, 100)) {
       setCanMove(true);
       console.log("Penguin selected. You can now move.");
@@ -228,8 +236,33 @@ const Room = () => {
       });
     }
   };
+
+  const handleGetEntityMap = async () => {
+    setEntityMap(await fetchEntityMap());
+    console.log('entity map', entityMap);
+  };
+
+  const fetchAndSetEntityMap = async () => {
+    const map = await fetchEntityMap();
+    console.log('setting entity map', map);
+    setEntityMap(map);
+  };
+
+
+  // Toggle debug mode
+  const toggleDebugMode = () => {
+    setDebugMode((prevDebugMode) => !prevDebugMode);
+    console.log('entities are', entityMap);
+    fetchAndSetEntityMap();
+  };
+
+
   return (
     <>
+
+      <button onClick={toggleDebugMode}>
+        {debugMode ? "Disable Debug Mode" : "Enable Debug Mode"}
+      </button>
       <div
         className="canvas"
         onClick={handleCanvasClick}
@@ -251,7 +284,11 @@ const Room = () => {
             />
           </>
         )}
+        {entityMap.map((entity, index) => (
+          <EntityMarker key={index} x={entity.x} y={entity.y} />
+        ))}
       </div>
+
       <div>
         {position && (
           <div>
@@ -268,8 +305,22 @@ const Room = () => {
             : "Click near the current Position to enable movement."}
         </p>
       </div>
+
+      <button onClick={handleGetEntityMap}>Get Entity Map</button>
     </>
   );
 };
+
+
+const EntityMarker = ({ x, y }: { x: number, y: number }) => {
+  return (
+
+    <div style={{ position: "absolute", left: `${x}px`, top: `${y}px`, width: "10px", height: "10px", backgroundColor: "red" }} >
+      x
+    </div>
+
+  )
+
+}
 
 export default Room;

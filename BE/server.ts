@@ -13,7 +13,7 @@ import type { Request } from "express";
 import multer from "multer";
 
 import { WebSocketServer } from "ws";
-import { createEntityMap } from "./controllers/mapController";
+import { createEntityMap, getEntityMap, getTestEntityMap } from "./controllers/mapController";
 
 // Extend the Request interface
 interface RequestWithFile extends Request {
@@ -45,6 +45,9 @@ router.post("/initialize-player", initializePlayer);
 router.post("/update-position", updatePosition);
 router.get("/get-position/:penguinId", getPosition);
 router.get("/get-room-data", getRoomData);
+
+router.get('/get-entity-map', getEntityMap);
+router.get('/get-test-entity-map', getTestEntityMap);
 router.post("/create-entity-map", createEntityMap);
 
 

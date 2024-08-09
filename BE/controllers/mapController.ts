@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -40,3 +41,13 @@ export const createEntityMap = [
         }
     }
 ];
+
+export const getEntityMap = (req: Request, res: Response) => {
+
+    // stub for the real getEntityMap function
+};
+
+export const getTestEntityMap = (req: Request, res: Response) => {
+    const testEntityMap = JSON.parse(fs.readFileSync(path.join(__dirname, '../lib/utils/testMap.json'), 'utf8'));
+    res.json(testEntityMap);
+}
