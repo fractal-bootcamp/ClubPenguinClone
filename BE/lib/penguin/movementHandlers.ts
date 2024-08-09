@@ -17,7 +17,7 @@ export const parseInputMovement = async ({ penguinId, clickDestPos, arrowKeyPres
     if (!penguin) return null
 
     if (clickDestPos) {
-        const updatedPenguin = { ...penguin, clickDestPos: clickDestPos, clickOriginPos: penguin.currentPos, arrowKeyPressed: null }
+        const updatedPenguin = { ...penguin, clickDestPos: clickDestPos, clickOriginPos: penguin.currentPos, isMoving: true, arrowKeyPressed: null }
         setPenguinData(penguinId, updatedPenguin)
     }
     if (arrowKeyPressed) {
@@ -92,6 +92,7 @@ const calculateNextPositionStep = async (penguinId: string): Promise<Penguin | n
         if (checkIfDestinationIsReached(currX, destX) && checkIfDestinationIsReached(currY, destY)) {
             updatedPenguin.clickDestPos = null;
             updatedPenguin.clickOriginPos = null;
+            updatedPenguin.isMoving = false;
         }
 
         return updatedPenguin

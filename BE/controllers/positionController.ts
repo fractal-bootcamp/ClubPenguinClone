@@ -119,6 +119,7 @@ export const getPosition = async (req: Request, res: Response) => {
         const penguin = await getPenguinData(penguinId)
         if (!penguin) return res.status(404).json({ error: 'Penguin not found' });
         const position = penguin.currentPos
+        const isMoving = penguin.isMoving
 
         if (!position) {
             return res.status(404).json({ error: 'Position not found' });
@@ -127,7 +128,9 @@ export const getPosition = async (req: Request, res: Response) => {
 
         return res.status(200).json({
             x: position[0],
-            y: position[1]
+            y: position[1],
+            isMoving: isMoving
+
         })
     }
     catch (error) {

@@ -4,19 +4,22 @@ import { updatePosition, getPosition, getRoomData, initializePlayer, storeInitia
 import { moveAllMovingPenguins } from "./lib/penguin/moveAllMovingPenguins";
 import path from "path";
 import type { Request } from 'express';
+import multer from 'multer';
+
 
 // Extend the Request interface
 interface RequestWithFile extends Request {
     file?: Express.Multer.File; // Define the file property
 }
 
+const FRONTEND_URL = process.env.FRONTEND_URL
 const app = express();
 const port = 9000;
 const router = express.Router();
 
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:5173', // Allow requests from this origin
+    origin: FRONTEND_URL, // Allow requests from this origin
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific methods
     allowedHeaders: ['Content-Type', 'Authorization', 'Content-Encoding'] // Allow specific headers
 }));
@@ -30,7 +33,6 @@ router.post('/initialize-player', initializePlayer);
 router.post('/update-position', updatePosition);
 router.get('/get-position/:penguinId', getPosition);
 router.get('/get-room-data', getRoomData)
-import multer from 'multer';
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -104,4 +106,4 @@ gameWorker = setInterval(function () {
     console.log("Game state:", gameState);
     incrementGameState()
     moveAllMovingPenguins()
-}, 100);
+}, 500);
