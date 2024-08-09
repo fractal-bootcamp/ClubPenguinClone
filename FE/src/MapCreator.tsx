@@ -17,7 +17,6 @@ const cellsY = Math.ceil(height / CHUNK_SIZE);
 
 
 
-
 const calculateNewEntityMap = (collisionMap: boolean[], prevEntityMap: EntityMap, entity: Entity) => {
     const updatedMap = collisionMap.map((collision, index) => {
         return {
