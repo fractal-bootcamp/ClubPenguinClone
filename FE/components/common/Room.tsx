@@ -48,7 +48,6 @@ const Room = () => {
   const [position, setPosition] = useState<Position>({ x: 528, y: 630 });
 
   const [canMove, setCanMove] = useState<boolean>(false); // New state to track if user can move
-  const [isMoving, setIsMoving] = useState<boolean>(false);
   const [isMovingFromBackend, setIsMovingFromBackend] =
     useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
@@ -125,11 +124,11 @@ const Room = () => {
       setPosition((prevPosition) => {
         console.log("inFetch", isMoving);
         if (isMoving && areCoordinatesEqual(positionData, prevPosition)) {
-          setIsMoving(false);
+          setIsMovingFromBackend(false);
         }
 
         if (!isMoving && !areCoordinatesEqual(positionData, prevPosition)) {
-          setIsMoving(true);
+          setIsMovingFromBackend(true);
         }
 
         return positionData;
@@ -143,7 +142,7 @@ const Room = () => {
     fetchRoom();
   }, []);
 
-  useInterval(fetchPosition, 1);
+  useInterval(fetchPosition, 100);
 
   const clickIsAvatarArea = (
     Position1: Position,
@@ -155,8 +154,6 @@ const Room = () => {
     );
     return distance <= radius;
   };
-
-  const defaultFrame = 10;
 
   const handleCanvasClick = async (event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -261,6 +258,7 @@ const Room = () => {
               Current Position: x={position.x}, y={position.y}
             </p>
             <p> Current Direction: {direction} </p>
+            <p> Is moving: {isMovingFromBackend} </p>
           </div>
         )}
         <p>

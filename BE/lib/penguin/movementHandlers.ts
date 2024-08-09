@@ -3,7 +3,7 @@
 // it actually checks if what was sent was a 
 // and returns 
 
-import { Entity, Penguin } from "../types";
+import type { Entity, Penguin } from "../types";
 import { getEntityMap } from "../utils/getRoomAndEntityMap";
 import redis from "../utils/redisClient";
 import { getPenguinData, setPenguinData } from "../utils/redisOps";
@@ -86,20 +86,25 @@ const calculateNextPositionStep = async (penguinId: string): Promise<Penguin | n
         const newX = await calculateNewDim(currX, destX)
         const newY = await calculateNewDim(currY, destY)
 
+        const distance = Math.sqrt(Math.pow(destX - newX, 2) + Math.pow(destY - newY, 2));
+        const isAtDestination = isWithinRange(newX, newY, destX, destY, 30); // Use a small threshold
+
+
         // TODO: set the orientation of the penguin through the comparison of 
         // current and destination positions
-        const updatedPenguin: Penguin = { ...penguin, currentPos: [Math.round(newX), Math.round(newY)] }
-        if (checkIfDestinationIsReached(currX, destX) && checkIfDestinationIsReached(currY, destY)) {
-            updatedPenguin.clickDestPos = null;
-            updatedPenguin.clickOriginPos = null;
-            updatedPenguin.isMoving = false;
+        const updatedPenguin: Penguin = {
+            ...penguin,
+            currentPos: isAtDestination ? [destX, destY] : [Math.round(newX), Math.round(newY)],
+            isMoving: !isAtDestination,
+            clickDestPos: isAtDestination ? null : clickDestPos,
+            clickOriginPos: isAtDestination ? null : penguin.clickOriginPos
         }
 
+        console.log("Updated penguin in calculateNextPositionStep:", updatedPenguin);
         return updatedPenguin
-
     }
     else {
-        return null
+        return { ...penguin, isMoving: false };
     }
 
 }
@@ -107,16 +112,23 @@ const calculateNextPositionStep = async (penguinId: string): Promise<Penguin | n
 // 0,0 -> 3, 1
 // 1,0
 
-const checkIfDestinationIsReached = (currDim, destDim) => {
-    if (destDim > currDim - 5 && destDim < currDim + 5) {
-        return true
-    }
-    else {
-        return false
-    }
+
+
+const isWithinRange = (x1: number, y1: number, x2: number, y2: number, range: number): boolean => {
+    return Math.abs(x1 - x2) <= range && Math.abs(y1 - y2) <= range;
 }
 
-const calculateNewDim = (currDim, destDim) => {
+const checkIfDestinationIsReached = (currDim: number, destDim: number) => {
+    // if (destDim > currDim - 10 && destDim < currDim + 10) {
+    //     return true
+    // }
+    // else {
+    //     return false
+    // }
+    return Math.abs(destDim - currDim) < 1;
+}
+
+const calculateNewDim = (currDim: number, destDim: number) => {
     if (destDim > currDim) {
         const diff = destDim - currDim
         return currDim + 0.1 * diff

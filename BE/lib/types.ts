@@ -10,6 +10,7 @@ export type Penguin = {
     clickOriginPos: [number, number] | null
     arrowKeyPressed: string | null
     currentRoom: string // room id
+    isMoving: boolean
 }
 
 export type WallCorner = {
