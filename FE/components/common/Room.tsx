@@ -35,19 +35,20 @@ const Room = () => {
 
   //Handling movement
   const [position, setPosition] = useState<Position>({ x: 528, y: 630 });
+  const [clickedPos, setClickedPos] = useState<Position | null>(null);
 
-  const [lastValidPosition, setLastValidPosition] = useState<Position | null>(
-    null
-  );
   const [canMove, setCanMove] = useState<boolean>(false); // New state to track if user can move
   const [isMoving, setIsMoving] = useState<boolean>(false);
+  const [isMovingFromBackend, setIsMovingFromBackend] =
+    useState<boolean>(false);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   // Character's movement animation
   const [direction, setDirection] = useState<number>(0);
+
   const [frame, setFrame] = useState<number>(0);
   const [animationInterval, setAnimationInterval] =
     useState<NodeJS.Timeout | null>(null);
-  const [animation, setAnimation] = useState<boolean>(false);
 
   //Character's characteristics
   const [body, setBody] = useState(bodySprite);
@@ -70,7 +71,11 @@ const Room = () => {
   // Function to fetch player Position
   const fetchPosition = async () => {
     try {
-      const positionData = await getPosition(penguinId);
+      const response = await getPosition(penguinId);
+      console.log("bruno response", response);
+      const { x, y, isMoving } = response;
+      const positionData = { x, y };
+      setIsMovingFromBackend(isMoving);
 
       console.log("inFetch1", isMoving);
 
@@ -96,7 +101,7 @@ const Room = () => {
     fetchRoom();
   }, []);
 
-  useInterval(fetchPosition, 500);
+  useInterval(fetchPosition, 1);
 
   const clickIsAvatarArea = (
     Position1: Position,
@@ -115,36 +120,48 @@ const Room = () => {
     const rect = event.currentTarget.getBoundingClientRect();
     const x = Math.floor(event.clientX - rect.left);
     const y = Math.floor(event.clientY - rect.top);
-    const clickedPos = { x, y };
+    const newClickedPos = { x, y };
 
-    if (clickIsAvatarArea(clickedPos, position, 100)) {
-      // User clicked within X px of the current Position
+    if (clickIsAvatarArea(newClickedPos, position, 100)) {
       setCanMove(true);
       console.log("Penguin selected. You can now move.");
-
-      //write a setDirection function that takes the sprite and renders it according to its direction. In the sprite, 128 x 128px,
-      // each row is a different direction, and each column is a different frame of the animation.
-      // The direction is a number from 0 to 7, and the frame is a number from 0 to 7. The function should return the background position for the sprite.
-      // there are eight different positions, row 0 is facing west, row 1 is facing north-west, row 2 is facing north, row 3 is facing north-east,
-      // row 4 is facing east, row 5 is facing south-east, row 6 is facing south, and row 7 is facing south-west.
-      // The frame is the current frame of the animation, which is a number from 0 to 7. The function should return the background position for the sprite.
-
-      //define that, when the penguin is clicked, by the position of the mouse with respect to the penguin, so that the penguin rotates with the
-      //mouse movement, and when the penguin is clicked, the penguin moves to the position of the mouse click.
-
-      //write a setDirection function that takes the sprite and renders it according to its direction.
-    } else if (canMove && clickedPos) {
+      // Additional logic to handle penguin direction and animation
+    } else if (canMove) {
       setCanMove(false);
-
-      setAnimation(true);
-
-      updatePosition(penguinId, clickedPos);
-
-      // setAnimation(false);
-    } else if (!canMove) {
+      setClickedPos(newClickedPos);
+      // setIsAnimating(true);
+      updatePosition(penguinId, newClickedPos); // Assume updatePosition triggers a re-render
+    } else {
       console.log("You must click the penguin first!");
     }
   };
+
+  const animationFrames = [
+    1664, 1536, 1408, 1280, 1152, 1024, 896, 768, 640, 512, 384, 256, 128, 0,
+  ];
+
+  useEffect(() => {
+    if (isMovingFromBackend) {
+      setIsAnimating(true);
+    } else {
+      setIsAnimating(false);
+    }
+  }, [isMovingFromBackend]);
+
+  // const animationFrames = [
+  //   0, 128, 256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664,
+  // ];
+
+  //Animate the character when it moves
+  useEffect(() => {
+    if (isAnimating) {
+      const animationDuration = 1000; // 1 second, adjust as needed
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+      }, animationDuration);
+      return () => clearTimeout(timer);
+    }
+  }, [isAnimating]);
 
   const handleMarkerClick = async (markerPosition: Position) => {
     // if (clickIsAvatarArea(markerPosition, position, 50)) {
@@ -207,25 +224,6 @@ const Room = () => {
   //   }
   // }, [direction]);
 
-  const frameSequence = [
-    1664, 1536, 1408, 1280, 1152, 1024, 896, 768, 640, 512, 384, 256, 128, 0,
-  ];
-
-  useEffect(() => {
-    if (animationInterval) {
-      clearInterval(animationInterval);
-    }
-
-    if (animation) {
-      const interval = setInterval(() => {
-        setFrame((prevFrame) => (prevFrame + 1) % frameSequence.length);
-      }, 130);
-
-      setAnimationInterval(interval);
-
-      return () => clearInterval(interval);
-    }
-  }, [animation]);
   // const pairedSequence = [
   //   { index: 0, value: 0 },
   //   { index: 1, value: 128 },
@@ -278,9 +276,10 @@ const Room = () => {
               frame={frame}
               body={body}
               head={head}
-              weapon={weaponSprite}
+              weapon={weapon}
               onMarkerClick={handleMarkerClick}
-              animationFrames={frameSequence}
+              isAnimating={isAnimating}
+              animationFrames={animationFrames}
             />
           </>
         )}

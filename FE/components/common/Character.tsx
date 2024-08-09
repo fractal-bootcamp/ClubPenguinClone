@@ -8,12 +8,14 @@ interface CharacterProps {
   direction: number;
   frame: number;
 
+  animationFrames: number[];
+
   body: string;
   head: string;
   weapon: string;
   onMarkerClick: (position: Position) => void; // Add prop for click handler
 
-  animationFrames: number[];
+  isAnimating: boolean;
 }
 
 interface Position {
@@ -27,6 +29,7 @@ const Character: React.FC<CharacterProps> = ({
 
   direction,
   frame,
+  animationFrames = [],
 
   body,
   head,
@@ -34,9 +37,12 @@ const Character: React.FC<CharacterProps> = ({
 
   onMarkerClick,
 
-  animationFrames,
+  isAnimating,
 }) => {
   //   const backgroundPosition = ` ${getSpritePosition(position)}`;
+  const [animationCell, setAnimationCell] = useState<number>(
+    animationFrames[0] ?? 0
+  );
 
   const spriteSize = 128;
 
@@ -116,10 +122,37 @@ const Character: React.FC<CharacterProps> = ({
   //   };
 
   // Function to get the pixel value based on animation frames
-  const getSpriteFrame = (direction: number, animationFrames: number[]) => {
-    const col = animationFrames[0]; // Only using the first frame of the sequence
-    return `-${col}px -${direction * spriteSize}px`;
+  const getSpriteFrame = (direction: number, animationCell: number) => {
+    return `-${animationCell}px -${direction * spriteSize}px`;
   };
+
+  useEffect(() => {
+    if (isAnimating && animationFrames.length > 0) {
+      let frameIndex = 7;
+      const animationInterval = setInterval(() => {
+        setAnimationCell(animationFrames[frameIndex]);
+        frameIndex = (frameIndex - 1) % animationFrames.length;
+      }, 80); // Adjust timing as needed
+
+      return () => clearInterval(animationInterval);
+    } else {
+      setAnimationCell(animationFrames[0] ?? 0); // Reset to first frame when not animating, or 0 if undefined
+    }
+  }, [isAnimating, animationFrames]);
+
+  //   useEffect(() => {
+  //     if (isAnimating && animationFrames.length > 0) {
+  //       let frameIndex = 0; // Start from the first frame
+  //       const animationInterval = setInterval(() => {
+  //         setAnimationCell(animationFrames[frameIndex]);
+  //         frameIndex = (frameIndex + 1) % animationFrames.length;
+  //       }, 80); // Adjust timing as needed
+
+  //       return () => clearInterval(animationInterval);
+  //     } else {
+  //       setAnimationCell(animationFrames[0] ?? 0); // Reset to the first frame when not animating
+  //     }
+  //   }, [isAnimating, animationFrames]);
 
   return (
     <>
@@ -137,8 +170,9 @@ const Character: React.FC<CharacterProps> = ({
             width: `${spriteSize}px`,
             height: `${spriteSize}px`,
             backgroundImage: `url(${body})`,
-            backgroundPosition: getSpriteDirection(direction),
-            spriteFrame: getSpriteFrame(direction, animationFrames),
+            backgroundPosition: isAnimating
+              ? getSpriteFrame(direction + 4, animationCell)
+              : getSpriteDirection(direction),
           }}
         />
         <div
@@ -150,8 +184,9 @@ const Character: React.FC<CharacterProps> = ({
             width: `${spriteSize}px`,
             height: `${spriteSize}px`,
             backgroundImage: `url(${head})`,
-            backgroundPosition: getSpriteDirection(direction),
-            spriteFrame: getSpriteFrame(direction, animationFrames),
+            backgroundPosition: isAnimating
+              ? getSpriteFrame(direction + 4, animationCell)
+              : getSpriteDirection(direction),
           }}
         />
         <div
@@ -163,8 +198,9 @@ const Character: React.FC<CharacterProps> = ({
             width: `${spriteSize}px`,
             height: `${spriteSize}px`,
             backgroundImage: `url(${weapon})`,
-            backgroundPosition: getSpriteDirection(direction),
-            spriteFrame: getSpriteFrame(direction, animationFrames),
+            backgroundPosition: isAnimating
+              ? getSpriteFrame(direction + 4, animationCell)
+              : getSpriteDirection(direction),
           }}
         />
       </div>
