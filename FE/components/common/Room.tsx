@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import "./Room.css";
 
 //API
@@ -31,7 +31,16 @@ const areCoordinatesEqual = (pos1: Position, pos2: Position): boolean => {
 
 const TEST_PENGUIN_ID = import.meta.env.VITE_TEST_PENGUIN_ID;
 
+interface ChatMessage {
+  username: string;
+  message: string;
+  timestamp: string;
+}
+
 const Room = () => {
+  //connect to the server
+  const ws = useRef<WebSocket | null>(null);
+
   //Room
   const [room, setRoom] = useState<Position[] | void>([]);
 
@@ -59,17 +68,50 @@ const Room = () => {
   //hard-coded penguinId
   const penguinId = TEST_PENGUIN_ID;
 
+  // Chat state
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputMessage, setInputMessage] = useState("");
+
+  useEffect(() => {
+    ws.current = new WebSocket("ws://localhost:9000");
+
+    ws.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "chat") {
+        setMessages((prevMessages) => [...prevMessages, data]);
+      }
+    };
+
+    return () => {
+      if (ws.current) {
+        ws.current.close();
+      }
+    };
+  }, []);
+
+  const sendMessage = useCallback(() => {
+    if (ws.current && inputMessage.trim()) {
+      ws.current.send(
+        JSON.stringify({
+          type: "chat",
+          username: "User", // You can replace this with actual username logic
+          message: inputMessage,
+        })
+      );
+      setInputMessage("");
+    }
+  }, [inputMessage]);
+
   const fetchRoom = async () => {
     try {
-      await initializePlayer(); // Initialize player in backend
-      const roomData = await getRoomData(); // Fetch room data from backend
-      setRoom(roomData); // Set room data
+      await initializePlayer();
+      const roomData = await getRoomData();
+      setRoom(roomData);
     } catch (error) {
       console.error("Error initializing room:", error);
     }
   };
 
-  // Function to fetch player Position
   const fetchPosition = async () => {
     try {
       const response = await getPosition(penguinId);
@@ -97,7 +139,6 @@ const Room = () => {
     }
   };
 
-  // Fetch room on component mount
   useEffect(() => {
     fetchRoom();
   }, []);
@@ -189,61 +230,6 @@ const Room = () => {
       });
     }
   };
-
-  // useEffect(() => {
-  //   console.log("Direction changed to:", direction);
-  // }, [direction]);
-  // useEffect(() => {
-  //   if (animationInterval) {
-  //     clearInterval(animationInterval);
-  //   }
-
-  //   if (isMoving && direction !== undefined) {
-  //     const interval = setInterval(() => {
-  //       setFrame((prevFrame) => (prevFrame + 1) % 13);
-  //     }, 130);
-
-  //     setAnimationInterval(interval);
-
-  //     return () => clearInterval(interval);
-  //   }
-  // }, [direction]);
-
-  // const pairedSequence = [
-  //   { index: 0, value: 0 },
-  //   { index: 1, value: 128 },
-  //   { index: 2, value: 256 },
-  //   { index: 3, value: 384 },
-  //   { index: 4, value: 512 },
-  //   { index: 5, value: 640 },
-  //   { index: 6, value: 768 },
-  //   { index: 7, value: 896 },
-  //   { index: 8, value: 1024 },
-  //   { index: 9, value: 1152 },
-  //   { index: 10, value: 1280 },
-  //   { index: 11, value: 1408 },
-  //   { index: 12, value: 1536 },
-  //   { index: 13, value: 1664 },
-  // ];
-
-  // useEffect(() => {
-  //   if (animationInterval) {
-  //     clearInterval(animationInterval);
-  //   }
-
-  //   if (direction !== undefined) {
-  //     // Start animating when direction changes
-  //     const interval = setInterval(() => {
-  //       setFrame((prevFrame) => (prevFrame + 1) % pairedSequence.length);
-  //     }, 500); // Adjust frame rate as needed
-
-  //     setAnimationInterval(interval);
-
-  //     // Cleanup function to clear the interval
-  //     return () => clearInterval(interval);
-  //   }
-  // }, [direction]); // Dependency array includes direction
-
   return (
     <>
       <div
