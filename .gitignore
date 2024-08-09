@@ -1,3 +1,8 @@
+entityMap_*.json
+entityMapOutput.json
+testMap.json
+
+
 # Logs
 logs
 *.log

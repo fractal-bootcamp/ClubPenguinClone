@@ -14,11 +14,22 @@ import Character from "./Character";
 import bodySprite from "../../src/assets/isometric-hero/clothes.png";
 import headSprite from "../../src/assets/isometric-hero/male_head1.png";
 import weaponSprite from "../../src/assets/isometric-hero/shortsword.png";
+import { useInterval } from "../hooks/useInterval";
 
 interface Position {
   x: number;
   y: number;
 }
+
+const areCoordinatesEqual = (pos1: Position, pos2: Position): boolean => {
+  console.log(pos1.x, pos2);
+  return (
+    Math.round(pos1.x) === Math.round(pos2.x) &&
+    Math.round(pos1.y) === Math.round(pos2.y)
+  );
+};
+
+const TEST_PENGUIN_ID = import.meta.env.VITE_TEST_PENGUIN_ID;
 
 const Room = () => {
   //Room
@@ -26,16 +37,19 @@ const Room = () => {
 
   //Handling movement
   const [position, setPosition] = useState<Position>({ x: 528, y: 630 });
-  const [newPosition, setNewPosition] = useState<Position | null>(null);
-  const [lastValidPosition, setLastValidPosition] = useState<Position | null>(
-    null
-  );
+
   const [canMove, setCanMove] = useState<boolean>(false); // New state to track if user can move
   const [isMoving, setIsMoving] = useState<boolean>(false);
+  const [isMovingFromBackend, setIsMovingFromBackend] =
+    useState<boolean>(false);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   // Character's movement animation
   const [direction, setDirection] = useState<number>(0);
+
   const [frame, setFrame] = useState<number>(0);
+  const [animationInterval, setAnimationInterval] =
+    useState<NodeJS.Timeout | null>(null);
 
   //Character's characteristics
   const [body, setBody] = useState(bodySprite);
@@ -43,7 +57,7 @@ const Room = () => {
   const [weapon, setWeapon] = useState(weaponSprite);
 
   //hard-coded penguinId
-  const penguinId = "cd5f144b-af4d-46cf-8506-29cfb25aea9e";
+  const penguinId = TEST_PENGUIN_ID;
 
   const fetchRoom = async () => {
     try {
@@ -58,8 +72,26 @@ const Room = () => {
   // Function to fetch player Position
   const fetchPosition = async () => {
     try {
-      const positionData = await getPosition(penguinId);
-      setPosition(positionData);
+      const response = await getPosition(penguinId);
+      console.log("bruno response", response);
+      const { x, y, isMoving } = response;
+      const positionData = { x, y };
+      setIsMovingFromBackend(isMoving);
+
+      console.log("inFetch1", isMoving);
+
+      setPosition((prevPosition) => {
+        console.log("inFetch", isMoving);
+        if (isMoving && areCoordinatesEqual(positionData, prevPosition)) {
+          setIsMoving(false);
+        }
+
+        if (!isMoving && !areCoordinatesEqual(positionData, prevPosition)) {
+          setIsMoving(true);
+        }
+
+        return positionData;
+      });
     } catch (error) {
       console.error("Error fetching Position:", error);
     }
@@ -70,14 +102,7 @@ const Room = () => {
     fetchRoom();
   }, []);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      fetchPosition();
-    }, 100);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(intervalId);
-  }, []);
+  useInterval(fetchPosition, 1);
 
   const clickIsAvatarArea = (
     Position1: Position,
@@ -90,45 +115,142 @@ const Room = () => {
     return distance <= radius;
   };
 
+  const defaultFrame = 10;
+
   const handleCanvasClick = async (event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const x = Math.floor(event.clientX - rect.left);
     const y = Math.floor(event.clientY - rect.top);
-    const clickedPos = { x, y };
+    const newClickedPos = { x, y };
 
-    if (clickIsAvatarArea(clickedPos, position, 50)) {
-      // User clicked within X px of the current Position
+    if (clickIsAvatarArea(newClickedPos, position, 100)) {
       setCanMove(true);
       console.log("Penguin selected. You can now move.");
-    } else if (canMove && clickedPos) {
+      // Additional logic to handle penguin direction and animation
+    } else if (canMove) {
       setCanMove(false);
-      updatePosition(penguinId, clickedPos);
-    } else if (!canMove) {
+      // setIsAnimating(true);
+      updatePosition(penguinId, newClickedPos); // Assume updatePosition triggers a re-render
+    } else {
       console.log("You must click the penguin first!");
     }
   };
 
-  const handleMarkerClick = async (markerPosition: Position) => {
-    // if (clickIsAvatarArea(markerPosition, position, 50)) {
-    //   // User clicked within X px of the current Position
-    //   setCanMove(true);
-    //   setIsMoving(false);
-    //   console.log("Marker selected. You can now move.");
-    // } else if (canMove && !isMoving) {
-    //   setIsMoving(true);
-    //   setNewPosition(markerPosition);
-    //   moveTowardsDestination(markerPosition);
-    // } else if (!canMove) {
-    //   console.log("You must click the marker first!");
-    // }
+  const animationFrames = [
+    1664, 1536, 1408, 1280, 1152, 1024, 896, 768, 640, 512, 384, 256, 128, 0,
+  ];
+
+  useEffect(() => {
+    if (isMovingFromBackend) {
+      setIsAnimating(true);
+    } else {
+      setIsAnimating(false);
+    }
+  }, [isMovingFromBackend]);
+
+  // const animationFrames = [
+  //   0, 128, 256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664,
+  // ];
+
+  //Animate the character when it moves
+  useEffect(() => {
+    if (isAnimating) {
+      const animationDuration = 1000; // 1 second, adjust as needed
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+      }, animationDuration);
+      return () => clearTimeout(timer);
+    }
+  }, [isAnimating]);
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    console.log("Can it move?", canMove);
+    if (canMove) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
+      // Calculate angle between character and mouse
+      const dx = mouseX - position.x;
+      const dy = mouseY - position.y;
+      let angle = Math.atan2(dy, dx);
+
+      // Convert angle to degrees and ensure it's positive
+      angle = ((angle * 180) / Math.PI + 360) % 360;
+
+      // Map angle to 8 directions
+      const newDirection = Math.floor(((angle + 22.5) % 360) / 45);
+
+      setDirection((prevDirection) => {
+        if (prevDirection !== newDirection) {
+          return newDirection;
+        }
+        return prevDirection;
+      });
+    }
   };
+
+  // useEffect(() => {
+  //   console.log("Direction changed to:", direction);
+  // }, [direction]);
+  // useEffect(() => {
+  //   if (animationInterval) {
+  //     clearInterval(animationInterval);
+  //   }
+
+  //   if (isMoving && direction !== undefined) {
+  //     const interval = setInterval(() => {
+  //       setFrame((prevFrame) => (prevFrame + 1) % 13);
+  //     }, 130);
+
+  //     setAnimationInterval(interval);
+
+  //     return () => clearInterval(interval);
+  //   }
+  // }, [direction]);
+
+  // const pairedSequence = [
+  //   { index: 0, value: 0 },
+  //   { index: 1, value: 128 },
+  //   { index: 2, value: 256 },
+  //   { index: 3, value: 384 },
+  //   { index: 4, value: 512 },
+  //   { index: 5, value: 640 },
+  //   { index: 6, value: 768 },
+  //   { index: 7, value: 896 },
+  //   { index: 8, value: 1024 },
+  //   { index: 9, value: 1152 },
+  //   { index: 10, value: 1280 },
+  //   { index: 11, value: 1408 },
+  //   { index: 12, value: 1536 },
+  //   { index: 13, value: 1664 },
+  // ];
+
+  // useEffect(() => {
+  //   if (animationInterval) {
+  //     clearInterval(animationInterval);
+  //   }
+
+  //   if (direction !== undefined) {
+  //     // Start animating when direction changes
+  //     const interval = setInterval(() => {
+  //       setFrame((prevFrame) => (prevFrame + 1) % pairedSequence.length);
+  //     }, 500); // Adjust frame rate as needed
+
+  //     setAnimationInterval(interval);
+
+  //     // Cleanup function to clear the interval
+  //     return () => clearInterval(interval);
+  //   }
+  // }, [direction]); // Dependency array includes direction
 
   return (
     <>
       <div
         className="canvas"
         onClick={handleCanvasClick}
-        style={{ width: "2000px", height: "2000px", position: "relative" }}
+        onMouseMove={handleMouseMove}
+        style={{ width: "1920px", height: "1080px", position: "relative" }}
       >
         {position && (
           <>
@@ -136,39 +258,31 @@ const Room = () => {
               x={position.x}
               y={position.y}
               direction={direction}
-              frame={isMoving ? frame : 0}
+              frame={frame}
               body={body}
               head={head}
-              weapon={weaponSprite}
-              onMarkerClick={handleMarkerClick}
+              weapon={weapon}
+              isAnimating={isAnimating}
+              animationFrames={animationFrames}
             />
           </>
         )}
-        {/* {position && (
-          <div
-            className="Position-marker"
-            style={{
-              position: "absolute",
-              left: `${position.x}px`,
-              top: `${position.y}px`,
-              width: "10px",
-              height: "10px",
-              backgroundColor: "red",
-              borderRadius: "50%",
-            }}
-          />
-        )} */}
       </div>
-      {position && (
+      <div>
+        {position && (
+          <div>
+            <p>
+              Current Position: x={position.x}, y={position.y}
+            </p>
+            <p> Current Direction: {direction} </p>
+          </div>
+        )}
         <p>
-          Current Position: x={position.x}, y={position.y}
+          {canMove
+            ? "You can now click anywhere to move."
+            : "Click near the current Position to enable movement."}
         </p>
-      )}
-      <p>
-        {canMove
-          ? "You can now click anywhere to move."
-          : "Click near the current Position to enable movement."}
-      </p>
+      </div>
     </>
   );
 };

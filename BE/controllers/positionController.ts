@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 
 
 import { getPenguinData, setPenguinData } from '../lib/utils/redisOps';
-import { Penguin } from '../lib/penguin/types';
+import { Penguin } from '../lib/types';
 import { randomUUID } from 'crypto';
 import { generateRandomColor } from '../lib/utils/generateRandomColor';
 import { parseInputMovement } from '../lib/penguin/movementHandlers';
@@ -49,14 +49,12 @@ export const generateRoom = (width: number, height: number): Position[] => {
 
 
 export const initializePlayer = async (req: Request, res: Response) => {
-    // for the future: do penguinId
 
-    //connect with redis client for real
     try {
         const initialPosition: Position = { x: 618, y: 618 };
         const newId = randomUUID(); // Generate a new UUID for the penguin
         const randomColor = generateRandomColor();
-        const newPenguin: Penguin = { id: newId, color: randomColor, name: "DUMMY_NAME", email: "DUMMY_EMAIL", currentPos: [initialPosition.x, initialPosition.y], clickDestPos: null, clickOriginPos: null, arrowKeyPressed: null };
+        const newPenguin: Penguin = { id: newId, color: randomColor, name: "DUMMY_NAME", email: "DUMMY_EMAIL", currentPos: [initialPosition.x, initialPosition.y], clickDestPos: null, clickOriginPos: null, arrowKeyPressed: null, currentRoom: 'Room0' };
         await setPenguinData(newId, newPenguin);
 
         res.status(200).json({ message: 'Player initialized with default position or already set' });
@@ -121,6 +119,7 @@ export const getPosition = async (req: Request, res: Response) => {
         const penguin = await getPenguinData(penguinId)
         if (!penguin) return res.status(404).json({ error: 'Penguin not found' });
         const position = penguin.currentPos
+        const isMoving = penguin.isMoving
 
         if (!position) {
             return res.status(404).json({ error: 'Position not found' });
@@ -129,7 +128,9 @@ export const getPosition = async (req: Request, res: Response) => {
 
         return res.status(200).json({
             x: position[0],
-            y: position[1]
+            y: position[1],
+            isMoving: isMoving
+
         })
     }
     catch (error) {
