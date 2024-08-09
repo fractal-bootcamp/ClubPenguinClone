@@ -9,9 +9,7 @@ interface CharacterMarkerProps {
   position: Position;
 }
 
-const CharacterMarker: React.FC<CharacterMarkerProps> = ({
-  position,
-}) => {
+const CharacterMarker: React.FC<CharacterMarkerProps> = ({ position }) => {
   const [isClicked, setIsClicked] = useState(false);
 
   // Handle click and trigger animation
@@ -26,8 +24,8 @@ const CharacterMarker: React.FC<CharacterMarkerProps> = ({
       className="character-marker-container" // Container for positioning and centering
       style={{
         position: "absolute",
-        left: `${position.x - (isClicked ? 30 : 30)}px`,
-        top: `${position.y - (isClicked ? 23 : 25) + 40}px`,
+        left: `${position.x - (isClicked ? -25 : -25)}px`,
+        top: `${position.y - (isClicked ? 23 : 25) + 105}px`,
         width: `${isClicked ? 75 : 75}px`,
         height: `${isClicked ? 30 : 30}px`,
         display: "flex",

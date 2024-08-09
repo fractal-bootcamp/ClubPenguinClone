@@ -29,6 +29,8 @@ const areCoordinatesEqual = (pos1: Position, pos2: Position): boolean => {
   );
 };
 
+const TEST_PENGUIN_ID = import.meta.env.VITE_TEST_PENGUIN_ID;
+
 const Room = () => {
   //Room
   const [room, setRoom] = useState<Position[] | void>([]);
@@ -55,7 +57,7 @@ const Room = () => {
   const [weapon, setWeapon] = useState(weaponSprite);
 
   //hard-coded penguinId
-  const penguinId = "a37deb36-58a2-4cea-8a4b-e2ebc024f1b5";
+  const penguinId = TEST_PENGUIN_ID;
 
   const fetchRoom = async () => {
     try {

@@ -106,4 +106,4 @@ gameWorker = setInterval(function () {
     console.log("Game state:", gameState);
     incrementGameState()
     moveAllMovingPenguins()
-}, 500);
+}, 100);
