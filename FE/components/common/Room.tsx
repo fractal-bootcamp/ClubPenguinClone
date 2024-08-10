@@ -11,9 +11,30 @@ import {
 
 //Character and sprites
 import Character from "./Character";
-import bodySprite from "../../src/assets/isometric-hero/clothes.png";
-import headSprite from "../../src/assets/isometric-hero/male_head1.png";
-import weaponSprite from "../../src/assets/isometric-hero/shortsword.png";
+import clothesMale from "../../src/assets/isometric-hero/body/clothes.png";
+import leatherArmorMale from "../../src/assets/isometric-hero/body/leather_armor.png";
+import steelArmorMale from "../../src/assets/isometric-hero/body/steel_armor.png";
+
+import maleHead1 from "../../src/assets/isometric-hero/head/male_head1.png";
+import maleHead2 from "../../src/assets/isometric-hero/head/male_head2.png";
+import maleHead3 from "../../src/assets/isometric-hero/head/male_head3.png";
+
+import dagger from "../../src/assets/isometric-hero/primary-weapon/dagger.png";
+import greatbow from "../../src/assets/isometric-hero/primary-weapon/greatbow.png";
+import greatstaff from "../../src/assets/isometric-hero/primary-weapon/greatstaff.png";
+import greatsword from "../../src/assets/isometric-hero/primary-weapon/greatsword.png";
+import longbow from "../../src/assets/isometric-hero/primary-weapon/longbow.png";
+import longsword from "../../src/assets/isometric-hero/primary-weapon/longsword.png";
+import rod from "../../src/assets/isometric-hero/primary-weapon/rod.png";
+import shortbow from "../../src/assets/isometric-hero/primary-weapon/shortbow.png";
+import shortsword from "../../src/assets/isometric-hero/primary-weapon/shortsword.png";
+import slingshot from "../../src/assets/isometric-hero/primary-weapon/slingshot.png";
+import staff from "../../src/assets/isometric-hero/primary-weapon/staff.png";
+import wand from "../../src/assets/isometric-hero/primary-weapon/wand.png";
+
+import buckler from "../../src/assets/isometric-hero/secondary-weapon/buckler.png";
+import shield from "../../src/assets/isometric-hero/secondary-weapon/shield.png";
+
 import { useInterval } from "../hooks/useInterval";
 
 interface Position {
@@ -56,13 +77,7 @@ const Room = () => {
   const [direction, setDirection] = useState<number>(0);
 
   const [frame, setFrame] = useState<number>(0);
-  const [animationInterval, setAnimationInterval] =
-    useState<NodeJS.Timeout | null>(null);
-
-  //Character's characteristics
-  const [body, setBody] = useState(bodySprite);
-  const [head, setHead] = useState(headSprite);
-  const [weapon, setWeapon] = useState(weaponSprite);
+  const [animationDuration, setAnimationDuration] = useState<number>(1000);
 
   //hard-coded penguinId
   const penguinId = TEST_PENGUIN_ID;
@@ -70,6 +85,42 @@ const Room = () => {
   // Chat state
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
+
+  // Character options
+  const [headOptions, setHeadOptions] = useState([
+    maleHead1,
+    maleHead2,
+    maleHead3,
+  ]);
+  const [bodyOptions, setBodyOptions] = useState([
+    clothesMale,
+    leatherArmorMale,
+    steelArmorMale,
+  ]);
+  const [primaryWeaponOptions, setPrimaryWeaponOptions] = useState([
+    dagger,
+    greatbow,
+    greatstaff,
+    greatsword,
+    longbow,
+    longsword,
+    rod,
+    shortbow,
+    shortsword,
+    slingshot,
+    staff,
+    wand,
+  ]);
+  const [secondaryWeaponOptions, setSecondaryWeaponOptions] = useState([
+    buckler,
+    shield,
+  ]);
+
+  const [selectedHead, setSelectedHead] = useState(maleHead1);
+  const [selectedBody, setSelectedBody] = useState(clothesMale);
+  const [selectedPrimaryWeapon, setSelectedPrimaryWeapon] = useState(dagger);
+  const [selectedSecondaryWeapon, setSelectedSecondaryWeapon] =
+    useState(buckler);
 
   useEffect(() => {
     ws.current = new WebSocket("ws://localhost:9000");
@@ -174,10 +225,9 @@ const Room = () => {
     }
   };
 
-  const animationFrames = [
-    1664, 1536, 1408, 1280, 1152, 1024, 896, 768, 640, 512, 384, 256, 128, 0,
-  ];
-
+  const animationFrames = [1280, 1152, 1024, 896, 768, 640, 512, 384, 256];
+  // 256, 128, 01664,
+  // 1408,1408,
   useEffect(() => {
     if (isMovingFromBackend) {
       setIsAnimating(true);
@@ -186,6 +236,10 @@ const Room = () => {
     }
   }, [isMovingFromBackend]);
 
+  useEffect(() => {
+    setAnimationDuration(isAnimating ? 2000 : 0);
+  }, [isAnimating]);
+
   // const animationFrames = [
   //   0, 128, 256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664,
   // ];
@@ -193,13 +247,12 @@ const Room = () => {
   //Animate the character when it moves
   useEffect(() => {
     if (isAnimating) {
-      const animationDuration = 1000; // 1 second, adjust as needed
       const timer = setTimeout(() => {
         setIsAnimating(false);
       }, animationDuration);
       return () => clearTimeout(timer);
     }
-  }, [isAnimating]);
+  }, [isAnimating, animationDuration]);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     console.log("Can it move?", canMove);
@@ -227,6 +280,23 @@ const Room = () => {
       });
     }
   };
+
+  const handleHeadSelection = (head: string) => {
+    setSelectedHead(head);
+  };
+
+  const handleBodySelection = (body: string) => {
+    setSelectedBody(body);
+  };
+
+  const handlePrimaryWeaponSelection = (weapon: string) => {
+    setSelectedPrimaryWeapon(weapon);
+  };
+
+  const handleSecondaryWeaponSelection = (weapon: string) => {
+    setSelectedSecondaryWeapon(weapon);
+  };
+
   return (
     <>
       <div
@@ -242,14 +312,48 @@ const Room = () => {
               y={position.y}
               direction={direction}
               frame={frame}
-              body={body}
-              head={head}
-              weapon={weapon}
+              body={selectedBody}
+              head={selectedHead}
+              primaryWeapon={selectedPrimaryWeapon}
+              secondaryWeapon={selectedSecondaryWeapon}
               isAnimating={isAnimating}
               animationFrames={animationFrames}
+              animationDuration={animationDuration}
             />
           </>
         )}
+      </div>
+      <div className="controls">
+        <h3>Select Head</h3>
+        {headOptions.map((head, index) => (
+          <button key={index} onClick={() => handleHeadSelection(head)}>
+            Head {index + 1}
+          </button>
+        ))}
+        <h3>Select Body</h3>
+        {bodyOptions.map((body, index) => (
+          <button key={index} onClick={() => handleBodySelection(body)}>
+            Body {index + 1}
+          </button>
+        ))}
+        <h3>Select Primary Weapon</h3>
+        {primaryWeaponOptions.map((weapon, index) => (
+          <button
+            key={index}
+            onClick={() => handlePrimaryWeaponSelection(weapon)}
+          >
+            Weapon {index + 1}
+          </button>
+        ))}
+        <h3>Select Secondary Weapon</h3>
+        {secondaryWeaponOptions.map((weapon, index) => (
+          <button
+            key={index}
+            onClick={() => handleSecondaryWeaponSelection(weapon)}
+          >
+            Weapon {index + 1}
+          </button>
+        ))}
       </div>
       <div>
         {position && (

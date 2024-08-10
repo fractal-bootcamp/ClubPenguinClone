@@ -12,9 +12,11 @@ interface CharacterProps {
 
   body: string;
   head: string;
-  weapon: string;
+  primaryWeapon: string;
+  secondaryWeapon: string;
 
   isAnimating: boolean;
+  animationDuration: number;
 }
 
 interface Position {
@@ -31,9 +33,11 @@ const Character: React.FC<CharacterProps> = ({
 
   body,
   head,
-  weapon,
+  primaryWeapon,
+  secondaryWeapon,
 
   isAnimating,
+  animationDuration,
 }) => {
   //   const backgroundPosition = ` ${getSpritePosition(position)}`;
   const [animationCell, setAnimationCell] = useState<number>(
@@ -59,48 +63,6 @@ const Character: React.FC<CharacterProps> = ({
     return directionMap[direction] || "0px 0px"; // Default value if direction is invalid
   };
 
-  //   const getSpriteDirection = (direction: number) => {
-  //     switch (direction) {
-  //       case 0:
-  //         return "0px -512px"; // East (facing right)
-  //       case 1:
-  //         return "0px -640px"; // South-East
-  //       case 2:
-  //         return "0px -768px"; // South
-  //       case 3:
-  //         return "0px -896px"; // South-West
-  //       case 4:
-  //         return "0px -0px"; // West (facing left)
-  //       case 5:
-  //         return "0px -128px"; // North-West
-  //       case 6:
-  //         return "0px -256px"; // North
-  //       case 7:
-  //         return "0px -384px"; // North-East
-  //     }
-  //   };
-
-  //   const frameSequence = [
-  //     0, 128, 256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664,
-  //   ];
-
-  //   const pairedSequence = [
-  //     { index: 0, value: 0 },
-  //     { index: 1, value: 128 },
-  //     { index: 2, value: 256 },
-  //     { index: 3, value: 384 },
-  //     { index: 4, value: 512 },
-  //     { index: 5, value: 640 },
-  //     { index: 6, value: 768 },
-  //     { index: 7, value: 896 },
-  //     { index: 8, value: 1024 },
-  //     { index: 9, value: 1152 },
-  //     { index: 10, value: 1280 },
-  //     { index: 11, value: 1408 },
-  //     { index: 12, value: 1536 },
-  //     { index: 13, value: 1664 },
-  //   ];
-
   const position: Position = { x, y };
 
   //     const row = direction; // direction corresponds to the row
@@ -124,17 +86,19 @@ const Character: React.FC<CharacterProps> = ({
 
   useEffect(() => {
     if (isAnimating && animationFrames.length > 0) {
-      let frameIndex = 7;
+      const fps = 12;
+      const frameInterval = 40 / fps;
+      let frameIndex = 0;
       const animationInterval = setInterval(() => {
         setAnimationCell(animationFrames[frameIndex]);
-        frameIndex = (frameIndex - 1) % animationFrames.length;
-      }, 80); // Adjust timing as needed
+        frameIndex = (frameIndex + 7) % animationFrames.length;
+      }, frameInterval);
 
       return () => clearInterval(animationInterval);
     } else {
       setAnimationCell(animationFrames[0] ?? 0); // Reset to first frame when not animating, or 0 if undefined
     }
-  }, [isAnimating, animationFrames]);
+  }, [isAnimating, animationFrames, animationDuration]);
 
   //   useEffect(() => {
   //     if (isAnimating && animationFrames.length > 0) {
@@ -182,6 +146,20 @@ const Character: React.FC<CharacterProps> = ({
             backgroundImage: `url(${head})`,
             backgroundPosition: isAnimating
               ? getSpriteFrame(direction + 4, animationCell)
+              : getSpriteDirection(direction + 4),
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+
+            top: 0,
+            left: 0,
+            width: `${spriteSize}px`,
+            height: `${spriteSize}px`,
+            backgroundImage: `url(${primaryWeapon})`,
+            backgroundPosition: isAnimating
+              ? getSpriteFrame(direction + 4, animationCell)
               : getSpriteDirection(direction),
           }}
         />
@@ -193,7 +171,7 @@ const Character: React.FC<CharacterProps> = ({
             left: 0,
             width: `${spriteSize}px`,
             height: `${spriteSize}px`,
-            backgroundImage: `url(${weapon})`,
+            backgroundImage: `url(${secondaryWeapon})`,
             backgroundPosition: isAnimating
               ? getSpriteFrame(direction + 4, animationCell)
               : getSpriteDirection(direction),
