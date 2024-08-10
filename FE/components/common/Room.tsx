@@ -295,21 +295,20 @@ const Room = () => {
         onMouseMove={handleMouseMove}
         style={{ width: "1920px", height: "1080px", position: "relative" }}
       >
-        {position && (
-          <>
-            <Character
-              x={position.x}
-              y={position.y}
-              direction={direction}
-              frame={frame}
-              body={body}
-              head={head}
-              weapon={weapon}
-              isAnimating={isAnimating}
-              animationFrames={animationFrames}
-            />
-          </>
-        )}
+        {roomPenguins.map((penguin) => (
+          <Character
+            key={penguin.id}
+            x={penguin.currentPos[0]}
+            y={penguin.currentPos[1]}
+            direction={direction}
+            frame={frame}
+            body={body}
+            head={head}
+            weapon={weapon}
+            isAnimating={isAnimating}
+            animationFrames={animationFrames}
+          />
+        ))}
         {entityMap.map((entity, index) => (
           <EntityMarker key={index} x={entity.x} y={entity.y} />
         ))}
