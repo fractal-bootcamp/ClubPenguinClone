@@ -16,7 +16,8 @@ import headSprite from "../../src/assets/isometric-hero/male_head1.png";
 import weaponSprite from "../../src/assets/isometric-hero/shortsword.png";
 import { useInterval } from "../hooks/useInterval";
 import { fetchEntityMap } from "../utils/fetchEntityMap";
-import { EntityMap, Penguin } from "../../src/utils/types";
+import type { EntityMap, Penguin, Room } from "../../src/utils/types";
+import { getPenguinsInRoom } from "../../API endpoints/roomService";
 
 interface Position {
   x: number;
@@ -44,7 +45,8 @@ const Room = () => {
   const ws = useRef<WebSocket | null>(null);
 
   //Room
-  const [room, setRoom] = useState<Position[] | void>([]);
+  const [room, setRoom] = useState<Room | void>();
+  const CURRENT_ROOM_ID = 'Room0';
 
   //Handling movement
   const [position, setPosition] = useState<Position>({ x: 528, y: 630 });
@@ -114,12 +116,23 @@ const Room = () => {
   const fetchRoom = async () => {
     try {
       await initializePlayer();
-      const roomData = await getRoomData();
+      const roomData = await getRoomData(CURRENT_ROOM_ID);
       setRoom(roomData);
     } catch (error) {
       console.error("Error initializing room:", error);
     }
   };
+
+  const fetchPenguins = async (roomName: string) => {
+    try {
+      const response = await getPenguinsInRoom(roomName);
+      const penguins = await response.json();
+      setRoomPenguins(penguins);
+    } catch (error) {
+      console.error('Error fetching penguins:', error);
+    }
+  };
+
 
   const fetchPosition = async () => {
     try {
@@ -148,8 +161,20 @@ const Room = () => {
     }
   };
 
+  // on room load
   useEffect(() => {
-    fetchRoom();
+    const fetchRoomAndPenguins = async () => {
+      await fetchRoom();
+      console.log('room is', room);
+      const roomName = room?.roomName;
+      if (roomName) {
+        fetchPenguins(roomName);
+      } else {
+        console.error('room name is not defined');
+      }
+    };
+
+    fetchRoomAndPenguins();
   }, []);
 
   useInterval(fetchPosition, 100);
@@ -309,6 +334,7 @@ const Room = () => {
       </div>
 
       <button onClick={handleGetEntityMap}>Get Entity Map</button>
+      <button onClick={() => { console.log('all penguins are', roomPenguins, "room is", room) }}>View All Penguins</button>
     </>
   );
 };

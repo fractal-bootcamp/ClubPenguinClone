@@ -4,7 +4,7 @@ import { getAllPenguins } from '../lib/utils/redisOps';
 
 export const getPenguinsInRoom = async (req: Request, res: Response) => {
     try {
-        const { roomId } = req.params;
+        const roomId = req.params.roomId;
         const allPenguins = await getAllPenguins()
         const penguinsInRoom = allPenguins.filter((penguin) => penguin.currentRoom === roomId)
         res.status(200).json(penguinsInRoom)

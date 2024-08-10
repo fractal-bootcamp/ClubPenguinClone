@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Room } from '../src/utils/types';
 
 const API_URL = 'http://localhost:9000';
 
@@ -21,9 +22,9 @@ export const initializePlayer = async () => {
 };
 
 // Function to fetch room data
-export const getRoomData = async (): Promise<Position[]> => {
+export const getRoomData = async (roomId: string): Promise<Room> => {
     try {
-        const response = await axios.get(`${API_URL}/get-room-data`);
+        const response = await axios.get(`${API_URL}/get-room-data/${roomId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching room data:', error);

@@ -38,3 +38,16 @@ export type EntityMapCell = {
 }
 
 export type EntityMap = EntityMapCell[]
+
+export interface Position {
+    x: number;
+    y: number;
+}
+
+export type Room = {
+    roomName: string,
+    coordinates: Position[],
+    status: 'ongoing' | 'paused' | 'ended',
+    players: string[],
+    playerInitialPosition: Position
+}

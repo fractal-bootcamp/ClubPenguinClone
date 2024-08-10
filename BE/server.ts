@@ -45,7 +45,7 @@ app.use(
 router.post("/initialize-player", initializePlayer);
 router.post("/update-position", updatePosition);
 router.get("/get-position/:penguinId", getPosition);
-router.get("/get-room-data", getRoomController);
+router.get("/get-room-data/:roomId", getRoomController);
 
 router.get('/get-entity-map', getEntityMap);
 router.get('/get-test-entity-map', fetchTestEntityMap);
