@@ -14,6 +14,7 @@ import multer from "multer";
 
 import { WebSocketServer } from "ws";
 import { createEntityMap, getEntityMap, getTestEntityMap } from "./controllers/mapController";
+import { getPenguinsInRoom } from "./controllers/roomController";
 
 // Extend the Request interface
 interface RequestWithFile extends Request {
@@ -49,6 +50,8 @@ router.get("/get-room-data", getRoomData);
 router.get('/get-entity-map', getEntityMap);
 router.get('/get-test-entity-map', getTestEntityMap);
 router.post("/create-entity-map", createEntityMap);
+
+router.get('/get-penguins-in-room/:roomId', getPenguinsInRoom);
 
 
 //Initialize the game state when the server starts

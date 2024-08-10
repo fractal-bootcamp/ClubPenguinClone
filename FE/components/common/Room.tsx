@@ -16,7 +16,7 @@ import headSprite from "../../src/assets/isometric-hero/male_head1.png";
 import weaponSprite from "../../src/assets/isometric-hero/shortsword.png";
 import { useInterval } from "../hooks/useInterval";
 import { fetchEntityMap } from "../utils/fetchEntityMap";
-import { EntityMap } from "../../src/utils/types";
+import { EntityMap, Penguin } from "../../src/utils/types";
 
 interface Position {
   x: number;
@@ -57,6 +57,8 @@ const Room = () => {
 
   const [entityMap, setEntityMap] = useState<EntityMap>([]);
   const [debugMode, setDebugMode] = useState<boolean>(false);
+
+  const [penguins, setPenguins] = useState<Penguin[]>([]);
 
 
 
