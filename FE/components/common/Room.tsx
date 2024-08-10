@@ -125,8 +125,7 @@ const Room = () => {
 
   const fetchPenguins = async (roomName: string) => {
     try {
-      const response = await getPenguinsInRoom(roomName);
-      const penguins = await response.json();
+      const penguins = await getPenguinsInRoom(roomName);
       setRoomPenguins(penguins);
     } catch (error) {
       console.error('Error fetching penguins:', error);
@@ -175,7 +174,7 @@ const Room = () => {
     };
 
     fetchRoomAndPenguins();
-  }, []);
+  }, [room]);
 
   useInterval(fetchPosition, 100);
 

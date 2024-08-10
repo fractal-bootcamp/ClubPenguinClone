@@ -1,3 +1,5 @@
+import { Penguin } from "../src/utils/types";
+
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 export const getPenguinsInRoom = async (roomName: string) => {
@@ -6,7 +8,7 @@ export const getPenguinsInRoom = async (roomName: string) => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        const data = await response.json();
+        const data: Penguin[] = await response.json();
         return data;
     } catch (error) {
         console.error('Error fetching penguins in room:', error);
