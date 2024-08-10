@@ -13,6 +13,7 @@ import type { Request } from "express";
 import multer from "multer";
 
 import { WebSocketServer } from "ws";
+import { createEntityMap, getEntityMap, getTestEntityMap } from "./controllers/mapController";
 
 // Extend the Request interface
 interface RequestWithFile extends Request {
@@ -45,44 +46,10 @@ router.post("/update-position", updatePosition);
 router.get("/get-position/:penguinId", getPosition);
 router.get("/get-room-data", getRoomData);
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, "../"));
-    },
-    filename: (req, file, cb) => {
-        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-        cb(null, `entityMap_${timestamp}.json`);
-    },
-});
+router.get('/get-entity-map', getEntityMap);
+router.get('/get-test-entity-map', getTestEntityMap);
+router.post("/create-entity-map", createEntityMap);
 
-const upload = multer({ storage });
-
-app.post(
-    "/create-entity-map",
-    upload.single("file"),
-    async (req: RequestWithFile, res) => {
-        console.log(req);
-
-        if (!req.file) {
-            return res.status(400).json({ error: "No file uploaded" });
-        }
-        const outputPath = path.join(__dirname, `../${req.file.filename}`);
-
-        try {
-            console.log("hello");
-
-            console.log(`Entity map written to ${outputPath}`);
-            res
-                .status(200)
-                .json({ message: "Entity map saved successfully", path: outputPath });
-        } catch (error) {
-            console.error("Error processing entity map:", error);
-            res
-                .status(500)
-                .json({ error: "Failed to process entity map", details: error });
-        }
-    }
-);
 
 //Initialize the game state when the server starts
 storeInitialGameState();
