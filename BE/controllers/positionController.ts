@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 
 import { getPenguinData, setPenguinData } from '../lib/utils/redisOps';
 import type { Penguin } from '../lib/types';
-import { randomUUID } from 'crypto';
+
 import { generateRandomColor } from '../lib/utils/generateRandomColor';
 import { parseInputMovement } from '../lib/penguin/movementHandlers';
 import redis from '../lib/utils/redisClient';
@@ -51,10 +51,15 @@ export const generateRoom = (width: number, height: number): Position[] => {
 export const initializePlayer = async (req: Request, res: Response) => {
 
     try {
+
+        // get the newId from the request
+        const { newId } = req.body;
+
         const initialPosition: Position = { x: 618, y: 618 };
-        const newId = randomUUID(); // Generate a new UUID for the penguin
+
+        const newIdFE = newId; // Generate a new UUID for the penguin
         const randomColor = generateRandomColor();
-        const newPenguin: Penguin = { id: newId, color: randomColor, name: "DUMMY_NAME", email: "DUMMY_EMAIL", currentPos: [initialPosition.x, initialPosition.y], clickDestPos: null, clickOriginPos: null, isMoving: false, arrowKeyPressed: null, currentRoom: 'Room0' };
+        const newPenguin: Penguin = { id: newIdFE, color: randomColor, name: "DUMMY_NAME", email: "DUMMY_EMAIL", currentPos: [initialPosition.x, initialPosition.y], clickDestPos: null, clickOriginPos: null, isMoving: false, arrowKeyPressed: null, currentRoom: 'Room0' };
         await setPenguinData(newId, newPenguin);
 
         res.status(200).json({ message: 'Player initialized with default position or already set' });
@@ -140,7 +145,7 @@ export const getPosition = async (req: Request, res: Response) => {
 }
 
 
-export const getRoomData = async (): Promise<Position[]> => {
+export const getRoomData = async (playerId: string): Promise<Position[]> => {
     try {
 
         //Since Room0 is the beta one, this will be hardcoded

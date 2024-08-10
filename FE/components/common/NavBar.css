@@ -1,10 +1,33 @@
-/* 
-.navbar-main{
-    display: flex;
-    padding: 5px;
-    flex-direction: row;
-    gap: 20px;
-    border-width: thick;
-    border-color: red;
+/* Main container for the navigation bar */
+.navbar-main {
+  display: flex;
+  padding: 15px;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #2c2c2c; /* Dark background for a medieval feel */
+  border: 3px solid #8b0000; /* Dark red border */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.7); /* Subtle shadow for depth */
+  font-family: 'UnifrakturCook', serif; /* Classic and medieval feel */
+}
 
-} */
+/* Navigation links */
+.navbar-main h3 {
+  margin: 0;
+  color: #e0d7c8; /* Light text color for contrast */
+  cursor: pointer;
+  text-shadow: 1px 1px 2px #000000; /* Subtle shadow for a mystical effect */
+  transition: color 0.3s ease, text-shadow 0.3s ease; /* Smooth transitions */
+}
+
+/* Hover effect for navigation links */
+.navbar-main h3:hover {
+  color: #ffcc00; /* Gold color for a striking effect */
+  text-shadow: 1px 1px 4px #ffcc00; /* Brighter shadow on hover */
+}
+
+/* Optional: Additional styling for active link */
+.navbar-main h3.active {
+  color: #ffcc00; /* Same as hover for consistency */
+  font-weight: bold; /* Bold text for active link */
+}

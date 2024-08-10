@@ -62,7 +62,12 @@ interface ChatMessage {
   timestamp: string;
 }
 
-const Room = () => {
+interface RoomProps {
+  width: string;
+  height: string;
+  playerId: string;
+}
+const Room = ({ width, height, playerId }) => {
   //connect to the server
   const ws = useRef<WebSocket | null>(null);
 
@@ -168,8 +173,7 @@ const Room = () => {
 
   const fetchRoom = async () => {
     try {
-      await initializePlayer();
-      const roomData = await getRoomData();
+      const roomData = await getRoomData(playerId);
       setRoom(roomData);
     } catch (error) {
       console.error("Error initializing room:", error);

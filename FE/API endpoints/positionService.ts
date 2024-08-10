@@ -8,10 +8,11 @@ interface Position {
 }
 
 // Function to initialize player
-export const initializePlayer = async () => {
+export const initializePlayer = async (newId: string) => {
     try {
+        // send newId to backend
         const response = await axios.post(`${API_URL}/initialize-player`, {
-            // Optional player details if needed
+            newId
         });
 
         console.log('Player initialized:', response.data);
@@ -21,7 +22,7 @@ export const initializePlayer = async () => {
 };
 
 // Function to fetch room data
-export const getRoomData = async (): Promise<Position[]> => {
+export const getRoomData = async (playerId: string): Promise<Position[]> => {
     try {
         const response = await axios.get(`${API_URL}/get-room-data`);
         return response.data;

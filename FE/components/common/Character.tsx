@@ -10,10 +10,10 @@ interface CharacterProps {
 
   animationFrames: number[];
 
-  body: string;
-  head: string;
-  primaryWeapon: string;
-  secondaryWeapon: string;
+  body: string | null;
+  head: string | null;
+  primaryWeapon: string | null;
+  secondaryWeapon: string | null;
 
   isAnimating: boolean;
   animationDuration: number;
@@ -86,12 +86,12 @@ const Character: React.FC<CharacterProps> = ({
 
   useEffect(() => {
     if (isAnimating && animationFrames.length > 0) {
-      const fps = 12;
-      const frameInterval = 40 / fps;
+      const fps = 40;
+      const frameInterval = 10 / fps;
       let frameIndex = 0;
       const animationInterval = setInterval(() => {
         setAnimationCell(animationFrames[frameIndex]);
-        frameIndex = (frameIndex + 7) % animationFrames.length;
+        frameIndex = (frameIndex + 7) % 12;
       }, frameInterval);
 
       return () => clearInterval(animationInterval);
