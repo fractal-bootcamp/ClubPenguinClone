@@ -1,58 +1,73 @@
-/* Main.css */
+/* Ensure the main container takes up full viewport size and centers its content */
 .main-main {
     display: flex; /* Flex layout for children */
-    flex-direction: column; /* Column direction for stacking elements vertically */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically */
     height: 100vh; /* Full viewport height */
-    overflow: hidden; /* Hide overflow */
+    width: 100vw; /* Full viewport width */
+    margin: 0; /* Remove default margins */
+    padding: 0; /* Remove default padding */
+    position: relative; /* Position relative for child absolute positioning */
+    overflow: hidden; /* Hide overflow if necessary */
 }
 
-
+/* Background container to hold the image */
 .save-screen {
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    background-color: rgb(16, 0, 0); /* Background color */
-    position: relative; /* Context for absolute positioning */
-}
-/* Image container for centering the image */
-.image-container {
-    position: absolute; /* Absolute positioning to cover the full area */
+    position: absolute; /* Absolute positioning to cover the entire viewport */
     top: 0;
     left: 0;
     width: 100%; /* Full width */
     height: 100%; /* Full height */
-    display: flex; /* Flexbox layout for centering */
+    background-color: rgb(16, 0, 0); /* Background color as fallback */
+    z-index: -1; /* Ensure it stays behind other content */
+}
+
+/* Image container for proper scaling and positioning */
+.image-container {
+    position: absolute; /* Cover the entire save-screen */
+    top: 0;
+    left: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    display: flex; /* Flexbox for centering the image */
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
-    overflow: hidden; /* Hide overflow */
+    overflow: hidden; /* Hide any overflow */
 }
 
 .image-container img {
-    max-width: 100%; /* Fit within container */
-    max-height: 100%; /* Fit within container */
-    object-fit: cover; /* Maintain aspect ratio */
+    width: 100%; /* Fit image to container width */
+    height: 100%; /* Fit image to container height */
+    object-fit: cover; /* Maintain aspect ratio while covering the container */
 }
 
-/* Title and navigation container */
-.title-container {
-    position: absolute; /* Absolute positioning */
-    top: 20%; /* Position from top */
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Center align */
+/* Container for overlay content (login, signup, etc.) */
+.overlay-container {
+    position: absolute; /* Absolute positioning for centered content */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center content */
     text-align: center; /* Center text */
-    z-index: 10; /* Ensure it appears above other content */
+    z-index: 1; /* Ensure it appears above the background */
 }
 
-/* Styling for the main title */
+/* Title container styling */
+.title-container {
+    margin-bottom: 20px; /* Spacing below the title */
+}
+
+/* Main font styling for title */
 .main-font {
-    color: white; /* White text color */
-    font-family: 'UnifrakturCook', serif; /* Custom font */
+    color: white; /* Ensure the title is visible against the image */
+    font-family: 'UnifrakturCook', serif; /* Apply the custom font */
     font-weight: 700; /* Bold text */
     font-size: 2rem; /* Font size */
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Text shadow */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Text shadow for better readability */
     cursor: pointer; /* Pointer cursor */
 }
 
-/* Container for the navigation bar */
+/* Navbar styling */
 .navbar-container {
     margin-top: 20px; /* Spacing from title */
     border: 1px solid white; /* White border */
@@ -61,80 +76,44 @@
     color: white; /* White text color */
     font-family: 'UnifrakturCook', serif; /* Custom font */
     font-weight: 700; /* Bold text */
-    z-index: 10; /* Ensure it appears above other content */
 }
 
-/* Container for authentication options and forms */
-.overlay-container {
-    position: absolute; /* Absolute positioning */
-    top: 50%; /* Center vertically */
-    left: 50%; /* Center horizontally */
-    transform: translate(-50%, -50%); /* Center align */
+/* Auth selector and form styling */
+.auth-selector, .auth-form {
+    margin-top: 20px; /* Margin for spacing */
     text-align: center; /* Center text */
-    z-index: 10; /* Ensure it appears above other content */
+    color: white; /* White text color */
+    font-family: 'UnifrakturCook', serif; /* Custom font */
 }
 
-/* Styling for authentication option buttons */
-.auth-selector {
-    margin-top: 20px;
+.auth-selector button, .auth-form input, .auth-form button {
+    margin: 10px; /* Margin around elements */
+    padding: 10px 20px; /* Padding inside elements */
+    font-family: 'UnifrakturCook', serif; /* Custom font */
+    font-weight: 700; /* Bold text */
+    font-size: 1rem; /* Font size */
+    color: white; /* White text color */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor */
+    transition: background-color 0.3s ease; /* Smooth background color transition */
 }
 
-.auth-selector button {
-    margin: 5px;
-    padding: 10px 20px;
-    font-family: 'UnifrakturCook', serif;
-    font-weight: 700;
-    font-size: 1rem;
-    color: white;
-    background-color: rgba(0, 0, 0, 0.5);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.auth-selector button:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-}
-
-/* Styling for authentication forms */
-.auth-form {
-    margin-top: 20px;
-    text-align: center;
-    color: white;
-    font-family: 'UnifrakturCook', serif;
-    background-color: rgba(0, 0, 0, 0.5); /* Background color for forms */
-    padding: 20px; /* Padding inside the form */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Shadow for better visibility */
+.auth-selector button:hover, .auth-form button:hover {
+    background-color: rgba(0, 0, 0, 0.8); /* Darker background on hover */
 }
 
 .auth-form input {
-    display: block;
-    margin: 10px auto;
-    padding: 10px;
-    font-family: 'UnifrakturCook', serif;
-    font-size: 1rem;
-    border: 1px solid white;
-    border-radius: 5px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
+    display: block; /* Block display for inputs */
+    width: calc(100% - 20px); /* Full width minus padding */
+    border: 1px solid white; /* White border */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    color: white; /* White text color */
 }
 
-.auth-form button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    font-family: 'UnifrakturCook', serif;
-    font-weight: 700;
-    font-size: 1rem;
-    color: white;
-    background-color: rgba(0, 0, 0, 0.5);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.auth-form button:hover {
-    background-color: rgba(0, 0, 0, 0.8);
+.auth-form {
+    padding: 20px; /* Padding inside the form */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Shadow for better visibility */
 }
