@@ -3,7 +3,7 @@ import cors from "cors";
 import {
     updatePosition,
     getPosition,
-    getRoomData,
+    getRoomController,
     initializePlayer,
     storeInitialGameState,
 } from "./controllers/positionController";
@@ -13,7 +13,7 @@ import type { Request } from "express";
 import multer from "multer";
 
 import { WebSocketServer } from "ws";
-import { createEntityMap, getEntityMap, getTestEntityMap } from "./controllers/mapController";
+import { createEntityMap, getEntityMap, fetchTestEntityMap } from "./controllers/mapController";
 import { getPenguinsInRoom } from "./controllers/roomController";
 
 // Extend the Request interface
@@ -45,10 +45,10 @@ app.use(
 router.post("/initialize-player", initializePlayer);
 router.post("/update-position", updatePosition);
 router.get("/get-position/:penguinId", getPosition);
-router.get("/get-room-data", getRoomData);
+router.get("/get-room-data", getRoomController);
 
 router.get('/get-entity-map', getEntityMap);
-router.get('/get-test-entity-map', getTestEntityMap);
+router.get('/get-test-entity-map', fetchTestEntityMap);
 router.post("/create-entity-map", createEntityMap);
 
 router.get('/get-penguins-in-room/:roomId', getPenguinsInRoom);

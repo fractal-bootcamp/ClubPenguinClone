@@ -1,4 +1,4 @@
-import { Penguin } from "../types"
+import type { Penguin, Room } from "../types"
 import redis from "./redisClient"
 
 const PENGUIN_SET_KEY = 'penguins'
@@ -29,4 +29,20 @@ export const deletePenguin = async (penguinId: string) => {
     const key = `penguin:${penguinId}`
     await redis.del(key)
     return await redis.srem(PENGUIN_SET_KEY, key)
+}
+
+
+const ROOM_SET_KEY = 'rooms'
+
+export const setRoomData = async (roomId: string, roomData: Room) => {
+    const key = `room:${roomId}`
+    await redis.set(key, JSON.stringify(roomData))
+    return await redis.sadd(ROOM_SET_KEY, key)
+
+}
+
+export const getRoomData = async (roomId: string): Promise<Room | null> => {
+    const response = await redis.get(`room:${roomId}`)
+    if (response) return JSON.parse(response)
+    else return null
 }

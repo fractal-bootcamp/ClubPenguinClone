@@ -47,7 +47,7 @@ export const getEntityMap = (req: Request, res: Response) => {
     // stub for the real getEntityMap function
 };
 
-export const getTestEntityMap = (req: Request, res: Response) => {
+export const fetchTestEntityMap = (req: Request, res: Response) => {
     const testEntityMap = JSON.parse(fs.readFileSync(path.join(__dirname, '../lib/utils/testMap.json'), 'utf8'));
     res.json(testEntityMap);
 }

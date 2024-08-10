@@ -58,7 +58,7 @@ const Room = () => {
   const [entityMap, setEntityMap] = useState<EntityMap>([]);
   const [debugMode, setDebugMode] = useState<boolean>(false);
 
-  const [penguins, setPenguins] = useState<Penguin[]>([]);
+  const [roomPenguins, setRoomPenguins] = useState<Penguin[]>([]);
 
 
 

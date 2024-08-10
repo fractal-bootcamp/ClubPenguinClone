@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
 
 
-import { getPenguinData, setPenguinData } from '../lib/utils/redisOps';
-import type { Penguin } from '../lib/types';
+import { getPenguinData, getRoomData, setPenguinData, setRoomData } from '../lib/utils/redisOps';
+import type { Penguin, Position, Room } from '../lib/types';
 import { randomUUID } from 'crypto';
 import { generateRandomColor } from '../lib/utils/generateRandomColor';
 import { parseInputMovement } from '../lib/penguin/movementHandlers';
@@ -15,10 +15,7 @@ type MovementHandlerProps = {
     arrowKeyPressed: string | null;
 }
 
-interface Position {
-    x: number;
-    y: number;
-}
+
 
 interface GameState {
     roomName: string;
@@ -70,13 +67,16 @@ export const initializePlayer = async (req: Request, res: Response) => {
 export const storeInitialGameState = async () => {
     try {
         console.log('Storing initial game state...');
-        await redis.set('game:state:Room0', JSON.stringify({
+        const initialRoom: Room = {
             roomName: 'Room0',
             coordinates: generateRoom(1000, 1000),
             status: 'ongoing',
             players: ['player1'],
             playerInitialPosition: { x: 618, y: 618 }
-        }));
+        }
+
+        setRoomData('Room0', initialRoom)
+
         console.log('Initial game state stored in Redis.');
     } catch (error) {
         console.error('Error storing initial game state:', error);
@@ -140,18 +140,10 @@ export const getPosition = async (req: Request, res: Response) => {
 }
 
 
-export const getRoomData = async (): Promise<Position[]> => {
-    try {
-
-        //Since Room0 is the beta one, this will be hardcoded
-        const roomData = await redis.get('game:state:Room0');
-        if (!roomData) {
-            throw new Error('No room data found');
-        }
-        const parsedData = JSON.parse(roomData);
-        return parsedData.coordinates; // Assuming coordinates are part of the room data
-    } catch (error) {
-        console.error('Error fetching room data:', error);
-        throw error;
+export const getRoomController = async (req: Request, res: Response) => {
+    const room = await getRoomData(req.params.roomId);
+    if (!room) {
+        res.status(404).json({ error: 'Room not found' });
     }
+    res.status(200).json(room);
 };
