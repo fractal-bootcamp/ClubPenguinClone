@@ -14,10 +14,14 @@ import Character from "./Character";
 import clothesMale from "../../src/assets/isometric-hero/body/clothes.png";
 import leatherArmorMale from "../../src/assets/isometric-hero/body/leather_armor.png";
 import steelArmorMale from "../../src/assets/isometric-hero/body/steel_armor.png";
+import clothesFemale from "../../src/assets/isometric_heroine/body/clothes.png";
+import leatherArmorFemale from "../../src/assets/isometric_heroine/body/leather_armor.png";
+import steelArmorFemale from "../../src/assets/isometric_heroine/body/steel_armor.png";
 
 import maleHead1 from "../../src/assets/isometric-hero/head/male_head1.png";
 import maleHead2 from "../../src/assets/isometric-hero/head/male_head2.png";
 import maleHead3 from "../../src/assets/isometric-hero/head/male_head3.png";
+import femaleHead1 from "../../src/assets/isometric_heroine/head/head_long.png";
 
 import dagger from "../../src/assets/isometric-hero/primary-weapon/dagger.png";
 import greatbow from "../../src/assets/isometric-hero/primary-weapon/greatbow.png";
@@ -91,11 +95,16 @@ const Room = () => {
     maleHead1,
     maleHead2,
     maleHead3,
+    femaleHead1,
+    null,
   ]);
   const [bodyOptions, setBodyOptions] = useState([
     clothesMale,
     leatherArmorMale,
     steelArmorMale,
+    steelArmorFemale,
+    leatherArmorFemale,
+    null,
   ]);
   const [primaryWeaponOptions, setPrimaryWeaponOptions] = useState([
     dagger,
@@ -110,17 +119,22 @@ const Room = () => {
     slingshot,
     staff,
     wand,
+    null,
   ]);
   const [secondaryWeaponOptions, setSecondaryWeaponOptions] = useState([
     buckler,
     shield,
+    null,
   ]);
 
-  const [selectedHead, setSelectedHead] = useState(maleHead1);
-  const [selectedBody, setSelectedBody] = useState(clothesMale);
-  const [selectedPrimaryWeapon, setSelectedPrimaryWeapon] = useState(dagger);
-  const [selectedSecondaryWeapon, setSelectedSecondaryWeapon] =
-    useState(buckler);
+  const [selectedHead, setSelectedHead] = useState<string | null>(femaleHead1);
+  const [selectedBody, setSelectedBody] = useState<string | null>(clothesMale);
+  const [selectedPrimaryWeapon, setSelectedPrimaryWeapon] = useState<
+    string | null
+  >(dagger);
+  const [selectedSecondaryWeapon, setSelectedSecondaryWeapon] = useState<
+    string | null
+  >(buckler);
 
   useEffect(() => {
     ws.current = new WebSocket("ws://localhost:9000");
@@ -281,19 +295,19 @@ const Room = () => {
     }
   };
 
-  const handleHeadSelection = (head: string) => {
+  const handleHeadSelection = (head: string | null) => {
     setSelectedHead(head);
   };
 
-  const handleBodySelection = (body: string) => {
+  const handleBodySelection = (body: string | null) => {
     setSelectedBody(body);
   };
 
-  const handlePrimaryWeaponSelection = (weapon: string) => {
+  const handlePrimaryWeaponSelection = (weapon: string | null) => {
     setSelectedPrimaryWeapon(weapon);
   };
 
-  const handleSecondaryWeaponSelection = (weapon: string) => {
+  const handleSecondaryWeaponSelection = (weapon: string | null) => {
     setSelectedSecondaryWeapon(weapon);
   };
 
@@ -345,7 +359,7 @@ const Room = () => {
             Weapon {index + 1}
           </button>
         ))}
-        <h3>Select Secondary Weapon</h3>
+        <h3>Select shield</h3>
         {secondaryWeaponOptions.map((weapon, index) => (
           <button
             key={index}

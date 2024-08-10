@@ -110,7 +110,7 @@ const MapCreator = () => {
       <div
         className="grid-container"
         style={{
-          background: `url('../../src/assets/follower_of_jheronimus_bosch_christ_in_limbo.jpg')`,
+          background: `url('../../src/assets/wallsMap.png')`,
           height: "100vh",
           width: "100vw",
           maxHeight: "100vh",

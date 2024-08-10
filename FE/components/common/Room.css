@@ -1,7 +1,7 @@
 .canvas {
     width: 100%;
     height: auto;
-    background-image: url('../../src/assets/Follower_of_Jheronimus_Bosch_Christ_in_Limbo.jpg');
+    background-image: url('../../src/assets/wallsMap.png');
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
